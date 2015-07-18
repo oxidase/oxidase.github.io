@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" href="triangle.css" />
+    <script id="vertex-shader" type="x-shader/x-vertex">
+     attribute vec4 vPosition;
+     uniform float vScale;
+     uniform float vTheta;
+     
+     void main()
+     {
+       gl_Position.zw = vPosition.zw;
+       float theta = vTheta * length(vPosition.xy);
+       mat2 m = vScale * mat2(cos(theta), -sin(theta), sin(theta), cos(theta));
+       gl_Position.xy = m*vPosition.xy;
+     }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      precision mediump float;
+      void main()
+      {
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+      }
+    </script>
+   </head>
+
+  <body>
+    Scale <span data-bind="text: scale"></span>
+    <div style="margin: 10px" data-bind="slider: scale, sliderOptions: {min: 0, max: 2, range: 'min', step: 0.01}"></div>
+
+    Theta <span data-bind="text: theta"></span>
+    <div style="margin: 10px" data-bind="slider: theta, sliderOptions: {min: -10, max: 10, range: 'min', step: 0.02}"></div>
+
+    Levels <span data-bind="text: levels"></span>, number of triangles <span data-bind="text: triangles"></span>
+    <div style="margin: 10px" data-bind="slider: levels, sliderOptions: {min: 0, max: 10, range: 'min', step: 1}"></div>
+
+    <div><span style="width: 7em; float: left;">Fractal</span> <div><input style="" type="checkbox" data-bind="checked: fractal" /></div></div>
+
+    <canvas id="gl-canvas" width="512" height="512">
+      Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+  </body>
+  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+  <script src="http://knockoutjs.com/downloads/knockout-3.3.0.js"></script>
+  <script type="text/javascript" src="js/webgl-utils.js"></script>
+  <script type="text/javascript" src="js/initShaders.js"></script>
+  <script type="text/javascript" src="js/mv.js"></script>
+  <script type="text/javascript" src="js/triangle.js"></script>
+</html>
