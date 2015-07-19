@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NDS tiles</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+  <link rel="stylesheet" href="tiles.css" />
+</head>
+<body>
+  <div id="map"></div>
+  <div id="info_row">
+    <span>Tile ID </span><input id="tile_id" data-bind="value: tile_id, valueUpdate: 'afterkeydown'" />
+    <span> level</span><span id="zoom_level" data-bind="text: zoom_level"></span>
+  </div>
+</body>
+<script type='text/javascript' src='http://code.jquery.com/jquery-2.1.4.min.js'></script>
+<script type='text/javascript' src='http://knockoutjs.com/downloads/knockout-3.3.0.js'></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+<script type="text/javascript" src="js/nds.js"></script>
+<script type="text/javascript" src="js/model.js"></script>
+</html>
