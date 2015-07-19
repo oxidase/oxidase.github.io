@@ -56,3 +56,8 @@ input#tile_id {
 span#zoom_level {
     margin-left: .5em;
 }
+
+.tile {
+    stroke: blue;
+    pointer-events: none;
+}
