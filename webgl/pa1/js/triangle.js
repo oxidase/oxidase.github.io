@@ -3,9 +3,6 @@
 var canvas, gl;
 var vScale, vTheta;
 
-var points = [];
-var levels = 5;
-
 ko.bindingHandlers.slider = {
     init: function (element, valueAccessor, allBindingsAccessor) {
         var options = allBindingsAccessor().sliderOptions || {};
@@ -63,28 +60,35 @@ var ViewModel = function() {
     self.theta = ko.observable(0);
     self.levels = ko.observable(5);
     self.fractal = ko.observable(false);
-    self.trianglesTrigger = ko.observable();
-    self.triangles = ko.computed(function() { self.trianglesTrigger(); return self.points.length / 3; });
-    self.scale.subscribe(function(value) { self.redraw(); });
-    self.theta.subscribe(function(value) { self.redraw(); });
-    self.levels.subscribe(function(value) { self.generate(self.levels(), self.fractal()) });
-    self.fractal.subscribe(function(value) { self.generate(self.levels(), self.fractal()) });
+    self.wireframe = ko.observable(false);
+    self.triangles = ko.observable(0);
+    self.theta_deg = ko.computed(function(value) { return Math.trunc(180 * self.theta() / Math.PI); });
+    self.scale.subscribe(function(value) { self.render(); });
+    self.theta.subscribe(function(value) { self.render(); });
+    self.wireframe.subscribe(function(value) { self.render() });
+    self.levels.subscribe(function(value) { self.generate() });
+    self.fractal.subscribe(function(value) { self.generate() });
 
-    self.redraw = function() { self.render(self.scale(), self.theta()); };
-    self.render = function(scale, theta) {
+    self.render = function() {
         gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.uniform1f(vScale, scale);
-        gl.uniform1f(vTheta, theta);
-        gl.drawArrays(gl.TRIANGLES, 0, self.points.length);
+        gl.uniform1f(vScale, self.scale());
+        gl.uniform1f(vTheta, self.theta());
+        if (self.wireframe()) {
+            for (var i = 0; i < self.points.length / 3; ++i) {
+                gl.drawArrays(gl.LINE_LOOP, 3 * i, 3);
+            }
+        } else {
+            gl.drawArrays(gl.TRIANGLES, 0, self.points.length);
+        }
     }
-    self.generate = function(levels, fractal) {
+    self.generate = function() {
         self.points = gentri(vec2(-1, -1), vec2(0,  1), vec2(1, -1), self.levels(), self.fractal());
-        self.trianglesTrigger.notifySubscribers();
+        self.triangles(self.points.length / 3);
         gl.bufferData(gl.ARRAY_BUFFER, flatten(self.points), gl.STATIC_DRAW);
-        self.redraw();
+        self.render();
     }
 
-    self.generate(self.levels(), self.fractal());
+    self.generate();
 }
 
 window.onload = function init()

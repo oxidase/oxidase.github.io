@@ -30,15 +30,18 @@
 
   <body>
     Scale <span data-bind="text: scale"></span>
+    <!-- <input data-bind="min: 0, max: 2, value: scale" type="range" min="0" max="2" step=".01" />
+    <input data-bind="value: scale" type="range" min="0" max="2" step=".01" keyboard="true" /> -->
     <div style="margin: 10px" data-bind="slider: scale, sliderOptions: {min: 0, max: 2, range: 'min', step: 0.01}"></div>
 
-    Theta <span data-bind="text: theta"></span>
-    <div style="margin: 10px" data-bind="slider: theta, sliderOptions: {min: -10, max: 10, range: 'min', step: 0.02}"></div>
+    Theta <span data-bind="text: theta_deg"></span>
+    <div style="margin: 10px" data-bind="slider: theta, sliderOptions: {min: -12.567, max: 12.567, range: 'min', step: 0.02}"></div>
 
     Levels <span data-bind="text: levels"></span>, number of triangles <span data-bind="text: triangles"></span>
     <div style="margin: 10px" data-bind="slider: levels, sliderOptions: {min: 0, max: 10, range: 'min', step: 1}"></div>
 
-    <div><span style="width: 7em; float: left;">Fractal</span> <div><input style="" type="checkbox" data-bind="checked: fractal" /></div></div>
+    <div><span style="width: 7em; float: left;">Gasket</span> <div><input class="check" type="checkbox" data-bind="checked: fractal" /></div></div>
+    <div><span style="width: 7em; float: left;">Wireframe</span> <div><input class="check" type="checkbox" data-bind="checked: wireframe" /></div></div>
 
     <canvas id="gl-canvas" width="512" height="512">
       Oops ... your browser doesn't support the HTML5 canvas element
