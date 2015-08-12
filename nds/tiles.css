@@ -18,7 +18,7 @@ html, body, #map {
 	background: rgba(255,255,255,0.8);
 	box-shadow: 0 0 15px rgba(0,0,0,0.2);
 	border-radius: 5px;
-  width: 160px;
+  width: 260px;
 }
 .info h4 {
 	margin: 0 0 5px;
@@ -48,9 +48,10 @@ div#info_row {
     padding: 4px;
 }
 
-input#tile_id {
+input#tile_id_input {
     margin-left: 10px;
     margin-right: 10px;
+    width: 100px;
 }
 
 span#zoom_level {
@@ -60,4 +61,10 @@ span#zoom_level {
 .tile {
     stroke: blue;
     pointer-events: none;
+}
+
+.tileid-labels {
+    color: #33f;
+    font-weight: bold;
+    font-size: larger;
 }

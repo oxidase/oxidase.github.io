@@ -9,7 +9,8 @@
 <body>
   <div id="map"></div>
   <div id="info_row">
-    <span>Tile ID </span><input id="tile_id" data-bind="value: tile_id, valueUpdate: 'afterkeydown'" />
+    <span>Tile ID </span><input id="tile_id_input" data-bind="value: tile_id_input, valueUpdate: 'afterkeydown'" />
+    <span id="tile_id" data-bind="text: tile_id"></span>
     <span> level</span><span id="zoom_level" data-bind="text: zoom_level"></span>
   </div>
 </body>
