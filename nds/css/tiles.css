@@ -33,7 +33,7 @@ html, body, #map {
     pointer-events: none;
     /* Use color, background, set margins for offset, etc */
 }
-        
+
 div#info_row {
 	  font: 14px/16px Arial, Helvetica, sans-serif;
     position: absolute;
@@ -67,4 +67,11 @@ span#zoom_level {
     color: #33f;
     font-weight: bold;
     font-size: larger;
+}
+
+.marker-icon {
+    background-image:url(../images/pin56.svg);
+    background-size: contain;
+    background-repeat:no-repeat;
+    background-position: center;
 }

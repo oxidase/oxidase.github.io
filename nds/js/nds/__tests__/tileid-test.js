@@ -1,6 +1,5 @@
 var test = require('unit.js');
 var leche = require('leche');
-
 var tileid = require('../tileid.js');
 
 describe('Basic tests', function() {
@@ -27,18 +26,27 @@ describe('Basic tests', function() {
        });
 
     leche.withData({ // 1000 0000 1001 1100 1110 1010 1001
-        EiffelTower: {lon:2.2945, lat:48.858222, ndslon:0x1a1b373, ndslat:0x22be5e2d, morton_hi:0x809cea9, morton_lo:0x67ad1da7,
+        EiffelTower: {lon:2.2945, lat:48.858222, ndslon:0x1a1b373, ndslat:0x22be5e2d,
+                      morton_hi:0x809cea9, morton_lo:0x67ad1da7, morton: '579221254078012839',
                       level10:0x20273, level13:0x809cea, tileid10:0x4020273, tileid13:0x20809CEA},
-        StatueOfLiberty: {lon:-74.044444, lat:40.689167, ndslon: 0xcb589ece, ndslat:0x1cef3c9f, morton_hi:0x52e5b9ea, morton_lo:0x4bf4d2fe,
+        StatueOfLiberty: {lon:-74.044444, lat:40.689167, ndslon: 0xcb589ece, ndslat:0x1cef3c9f,
+                          morton_hi:0x52e5b9ea, morton_lo:0x4bf4d2fe, morton: '5973384896724652798',
                           level10:0x14b96e, level13:0x52e5b9e, tileid10:0x414B96E, tileid13:0x252E5B9E},
-        SugarloafMountain: {lon:-43.157444, lat:-22.948658, ndslon:0xe14f6d56, ndslat:0x6fae5306, morton_hi:0x7cab98fd, morton_lo:0x365b113c,
-                            level10:0x1f2ae6, level13:0x7cab98f, tileid10:0x41F2AE6, tileid13:0x27CAB98F},
-        SydneyOperaHouse: {lon:151.214189, lat:-33.857529, ndslon:0x6b87b3f9, ndslat:0x67ec6cca, morton_hi:0x3c6fe8b5, morton_lo:0x6da5f5c9,
+        SugarloafMountain: {lon:-43.157444, lat:-22.948658, ndslon:0xe14f6d56, ndslat:0x6fae5306,
+                            morton_hi:0x7cab98fd, morton_lo:0x365b113c, morton: '8983442095026671932',
+                            level10:0x1f2ae6,level13:0x7cab98f, tileid10:0x41F2AE6, tileid13:0x27CAB98F},
+        SydneyOperaHouse: {lon:151.214189, lat:-33.857529, ndslon:0x6b87b3f9, ndslat:0x67ec6cca,
+                           morton_hi:0x3c6fe8b5, morton_lo:0x6da5f5c9, morton: '4354955230616876489',
                            level10:0xf1bfa, level13:0x3c6fe8b, tileid10:0x40F1BFA, tileid13:0x23C6FE8B},
-        NearTheMilleniumDome: {lon:0.0, lat:51.503, ndslon:0, ndslat:0x249fd5c4, morton_hi:0x82082aa, morton_lo:0xa222a020,
-                               level10:0x20820,  level13:0x82082a, tileid10:0x4020820, tileid13:0x2082082A},
-        NearQuito: {lon:-78.45, lat:0.0, ndslon:0xc8369d04, ndslat:0, morton_hi:0x50400514, morton_lo:0x41510010,
-                    level10:0x141001,  level13:0x5040051, tileid10:0x4141001, tileid13:0x25040051}
+        NearTheMilleniumDome: {lon:0.0, lat:51.503, ndslon:0, ndslat:0x249fd5c4,
+                               morton_hi:0x82082aa, morton_lo:0xa222a020, morton: '585611620934393888',
+                               level10:0x20820, level13:0x82082a, tileid10:0x4020820, tileid13:0x2082082A},
+        NearQuito: {lon:-78.45, lat:0.0, ndslon:0xc8369d04, ndslat:0,
+                    morton_hi:0x50400514, morton_lo:0x41510010, morton: '5782627506097029136',
+                    level10:0x141001, level13:0x5040051, tileid10:0x4141001, tileid13:0x25040051},
+        Marienplatz: {lon:11.575506, lat:48.137270, ndslon:138101165, ndslat:574300001,
+                    morton_hi:138940367, morton_lo:313224275, morton: '596744332672461907',
+                    level10:135683, level13:8683772, tileid10:67244547, tileid13:545554684}
     }, function(d) {
            it('should return correct NDS coordinates from the WGS', function() {
                test.assert.equal(tileid.lon2nds(d.lon), d.ndslon);
@@ -95,6 +103,12 @@ describe('Basic tests', function() {
                (d.lon).must.be.between(coord[0],  coord[0] + dist);
                (d.lat).must.be.between(coord[1],  coord[1] + dist);
            });
+           it('should return Morton code string from WGS coords', function() {
+               test.assert.equal(tileid.morton64string(tileid.wgs2morton64(d.lon, d.lat)), d.morton);
+           });
+           it('should return Morton code string from NDS coords', function() {
+               test.assert.equal(tileid.morton64string(tileid.nds2morton64(d.ndslon, d.ndslat)), d.morton);
+           });
        });
 
     leche.withData({
@@ -123,6 +137,30 @@ describe('Basic tests', function() {
                test.assert.equal(tileid.wgs2tileid(d.lng, d.lat, d.level), d.tileid);
                test.array(tileid.tileid2wgs(d.tileid)).is(d.sw);
                test.assert.equal(tileid.level2distance(tileid.tileid2level(d.tileid)), d.dist);
+           });
+       });
+
+    leche.withData({
+        point1: {morton64: [138940367, 313224275], morton: '596744332672461907'},
+        point2: {morton64: [1472970910, 4278899788], morton: '6326361890688259148'},
+        uint64m1: {morton64: [4294967295., 4294967295.], morton: '18446744073709551615'},
+        zero: {morton64: [0, 0], morton: '0'},
+        million: {morton64: [0, 1000000], morton: '1000000'},
+        billion: {morton64: [0, 1000000000], morton: '1000000000'},
+        trillion: {morton64: [232, 3567587328], morton: '1000000000000'},
+        quadrillion: {morton64: [232830, 2764472320], morton: '1000000000000000'}
+    }, function(d) {
+           it('should return correct Morton code as a string from morton64', function() {
+               test.assert.equal(tileid.morton64string(d.morton64), d.morton);
+           });
+       });
+
+    leche.withData({
+        point1: {nds: [138101165, 574300001], morton: '596744332672461907'},
+        point2: {nds: [-108597014 + 0x100000000, 462156674], morton: '6326361890688259148'}
+    }, function(d) {
+           it('should return correct Morton code as a string for NDS coordinates', function() {
+               test.assert.equal(tileid.morton64string(tileid.nds2morton64(d.nds[0], d.nds[1])), d.morton);
            });
        });
 });

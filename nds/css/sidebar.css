@@ -1,0 +1,58 @@
+* {
+    /* border: 1px solid #000000; */
+}
+
+#sidebar {
+    position:absolute;
+    top:0;bottom:0px;right:0px;width:71px;
+    overflow: hidden;
+}
+#sidebar .panel{
+    z-index:5;
+    background:#f2f2f2;
+    position:absolute;
+    top:0;bottom:0;right:0;
+}
+#sidebar .panel .button {
+    display:block;width:71px;height:71px;
+    background-image:url(../images/map30.svg);
+    background-size: 80%;
+    background-repeat:no-repeat;
+    background-position: center;
+    background-color: #9cc2ce;
+}
+#sidebar .panel .button#coordinates {
+    background-image:url(../images/map30.svg);
+}
+#sidebar .panel .button#distance {
+    background-image:url(../images/distance1.svg);
+}
+#sidebar .panel .button#rectangles {
+    background-image:url(../images/multimedia-option231.svg);
+}
+#sidebar #info {
+    display:block;
+    position:absolute;
+    z-index:4;
+    background:#f2f2f2;
+    top:0;bottom:0px;left:0px;width:320px;
+}
+
+/* Coordinates info page */
+
+.scrollable {
+    height: 100%; width: 100%;
+    position: absolute;
+    overflow-y: auto;
+}
+
+.coordinates {
+    padding:0; margin:0;
+}
+
+.coordinates li.coordinate {
+    list-style-type: none;
+    border: 1px solid #ffffff;
+    font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
+    font-size: 16px;
+}

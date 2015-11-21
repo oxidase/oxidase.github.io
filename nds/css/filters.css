@@ -1,0 +1,117 @@
+.icon-red {}
+
+.icon-orange {
+  -webkit-filter: hue-rotate(40deg) saturate(0.5) brightness(390%) saturate(4);
+  filter: hue-rotate(40deg) saturate(0.5) brightness(390%) saturate(4);
+}
+
+.icon-yellow {
+  -webkit-filter: hue-rotate(70deg) saturate(100);
+  filter: hue-rotate(70deg) saturate(100);
+}
+
+.icon-green {
+  -webkit-filter: hue-rotate(120deg) saturate(1.5);
+  filter: hue-rotate(120deg) saturate(1.5);
+}
+
+.icon-blue {
+  -webkit-filter: hue-rotate(240deg) saturate(100);
+  filter: hue-rotate(240deg) saturate(5);
+}
+
+.icon-indigo {
+  -webkit-filter: hue-rotate(276deg) saturate(0.1) saturate(6.25) brightness(73%);
+  filter: hue-rotate(276deg) saturate(0.1) saturate(6.25) brightness(73%)
+}
+
+.icon-violet {
+  -webkit-filter: hue-rotate(260deg) saturate(100) saturate(.2) brightness(220%);
+  filter: hue-rotate(260deg) saturate(100) saturate(.2) brightness(220%);
+}
+
+.icon-cyan {
+  filter: invert(1);
+  -webkit-filter: invert(1);
+}
+
+.icon-magenta {
+  -webkit-filter: hue-rotate(260deg) saturate(100);
+  filter: hue-rotate(260deg) saturate(100);
+
+}
+
+.icon-lime {
+  -webkit-filter: hue-rotate(80deg) saturate(100);
+  filter: hue-rotate(80deg) saturate(100);
+}
+
+.icon-olive {
+  -webkit-filter: hue-rotate(35deg) saturate(.5) brightness(630%) saturate(100) brightness(50%);
+  filter: hue-rotate(35deg) saturate(.5) brightness(630%) saturate(100) brightness(50%);
+}
+
+.icon-maroon {
+  -webkit-filter: hue-rotate(35deg) saturate(.5) brightness(288%) saturate(100) brightness(50%);
+  filter: hue-rotate(35deg) saturate(.5) brightness(288%) saturate(100) brightness(50%);
+}
+
+.icon-purple {
+  filter: hue-rotate(300deg) saturate(.64);
+  -webkit-filter: hue-rotate(300deg) saturate(.64);
+}
+
+.icon-white {
+  -webkit-filter: grayscale(100%) brightness(5);
+  filter: grayscale(100%) brightness(5);
+}
+
+.icon-gray10 {
+  -webkit-filter: grayscale(100%) brightness(5) brightness(.9);
+  filter: grayscale(100%) brightness(5) brightness(.9);
+}
+
+.icon-gray20 {
+  -webkit-filter: grayscale(100%) brightness(5) brightness(80%);
+  filter: grayscale(100%) brightness(5) brightness(80%);
+}
+
+.icon-gray30 {
+  -webkit-filter: grayscale(100%) brightness(500%) brightness(70%);
+  filter: grayscale(100%) brightness(500%) brightness(70%);
+}
+
+.icon-gray40 {
+  -webkit-filter: grayscale(100%) brightness(500%) brightness(60%);
+  filter: grayscale(100%) brightness(500%) brightness(60%);
+}
+
+.icon-gray50 {
+  -webkit-filter: grayscale(100%) brightness(500%) brightness(50%);
+  filter: grayscale(100%) brightness(500%) brightness(50%);
+}
+
+.icon-gray60 {
+  -webkit-filter: grayscale(100%) brightness(500%) brightness(40%);
+  filter: grayscale(100%) brightness(500%) brightness(40%);
+}
+
+.icon-gray70 {
+  -webkit-filter: grayscale(100%) brightness(500%) brightness(30%);
+  filter: grayscale(100%) brightness(500%) brightness(30%);
+}
+
+.icon-gray80 {
+  -webkit-filter: grayscale(100%) brightness(500%) brightness(20%);
+  filter: grayscale(100%) brightness(500%) brightness(20%);
+}
+
+.icon-gray90 {
+  -webkit-filter: grayscale(100%) brightness(500%) brightness(10%);
+  filter: grayscale(100%) brightness(500%) brightness(10%);
+}
+
+.icon-black {
+  -webkit-filter: grayscale(100%) brightness(-5);
+  filter: grayscale(100%) brightness(-5);
+}

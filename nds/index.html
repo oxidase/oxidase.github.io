@@ -3,22 +3,32 @@
 <head>
   <title>NDS tiles</title>
   <meta charset="utf-8" />
-  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
-  <link rel="stylesheet" href="tiles.css" />
+  <link type="text/css" rel="stylesheet" href="lib/leaflet/leaflet.css" />
+  <link type="text/css" rel="stylesheet" href="css/tiles.css" />
+  <link type="text/css" rel="stylesheet" href="css/sidebar.css" />
+  <link type="text/css" rel="stylesheet" href="css/filters.css" />
+  <script data-main="js/app" src="lib/require.js"></script>
 </head>
 <body>
   <div id="map"></div>
+
+  <!-- Side bar -->
+  <div id="sidebar">
+    <div class="panel">
+      <a href="#" id="coordinates" class="button" title="Coordinates"></a>
+      <a href="#" id="distance" class="button" title="Measure distances"></a>
+      <a href="#" id="rectangles" class="button" title="Tiles"></a>
+    </div>
+    <div id="info"></div>
+  </div>
+
+  <!-- TODO: move to sidebar -->
   <div id="info_row">
     <span>Tile ID </span><input id="tile_id_input" data-bind="value: tile_id_input, valueUpdate: 'afterkeydown'" />
     <span id="tile_id" data-bind="text: tile_id"></span>
     <span> level</span><span id="zoom_level" data-bind="text: zoom_level"></span>
   </div>
-</body>
-<script type='text/javascript' src='http://code.jquery.com/jquery-2.1.4.min.js'></script>
-<script type='text/javascript' src='http://knockoutjs.com/downloads/knockout-3.3.0.js'></script>
-<script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
-<script type="text/javascript" src="js/tileid.js"></script>
-<script type="text/javascript" src="js/model.js"></script>
+
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
