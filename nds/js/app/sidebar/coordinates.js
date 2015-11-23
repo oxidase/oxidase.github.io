@@ -10,27 +10,27 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         return Math.abs(Math.round(100000000. * x)) / 100000000.;
     }
 
-    function Coordinate(layer, lat, lon, color) {
+    function Coordinate(layer, lat, lng, color) {
         var self = this;
 
         self.lat = ko.observable(lat);
-        self.lon = ko.observable(lon);
+        self.lng = ko.observable(lng);
         self.color = color;
 
         self.text = ko.pureComputed({owner: self,
-            read: function () { return tileid.coord2text(self.lat()) + ", " + tileid.coord2text(self.lon()); }
+            read: function () { return tileid.coord2text(self.lat()) + ", " + tileid.coord2text(self.lng()); }
         });
 
         self.wgs = ko.pureComputed({owner: self,
-            read: function () { return round8(self.lon()) + ", " + round8(self.lat()); }
+            read: function () { return round8(self.lng()) + ", " + round8(self.lat()); }
         });
 
         self.nds = ko.pureComputed({owner: self,
-            read: function () { return tileid.lon2nds(self.lon()) + ", " + tileid.lat2nds(self.lat()); }
+            read: function () { return tileid.lon2nds(self.lng()) + ", " + tileid.lat2nds(self.lat()); }
         });
 
         self.morton = ko.pureComputed({owner: self,
-            read: function () { return tileid.morton64string(tileid.wgs2morton64(self.lon(), self.lat())); }
+            read: function () { return tileid.morton64string(tileid.wgs2morton64(self.lng(), self.lat())); }
         });
 
         self.remove = function (layer) {
@@ -38,10 +38,8 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         }
 
         self._icon = L.divIcon({className: 'marker-icon icon-' + self.color, iconSize: [32, 32], iconAnchor: [12, 41]});
-        self._marker = L.marker([lat, lon], { icon: self._icon, draggable: true }).addTo(layer);
-        //self._marker.on('dragstart', function (e) { e.target.isDragging = true; });
-        //self._marker.on('dragend', function (e) { e.target.isDragging = false; });
-        self._marker.on('drag', function (e) { var ll = e.target.getLatLng(); self.lat(ll.lat); self.lon(ll.lng); });
+        self._marker = L.marker([lat, lng], { icon: self._icon, draggable: true }).addTo(layer);
+        self._marker.on('drag', function (e) { var ll = e.target.getLatLng(); self.lat(ll.lat); self.lng(ll.lng); });
     }
 
     function CoordinatesViewModel(map) {
@@ -60,6 +58,10 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         self.remove = function(coordinate) {
             coordinate.remove(self._markers);
             self.coordinates.remove(coordinate);
+        };
+
+        self.panTo = function(coordinate) {
+            self._map.panTo([coordinate.lat(), coordinate.lng()]);
         };
 
         self.activate = function () {

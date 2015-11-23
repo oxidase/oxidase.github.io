@@ -200,10 +200,10 @@ exports.tileid2wgs = function(tileid) {
 
 exports.coord2text = function(x) {
     var sign = x >= 0 ? '+' : '-',
-        absx = Math.abs(Math.round(1000000. * x)) / 1000000.,
-        degrees = Math.floor(absx),
-        minutes = Math.floor(   60. * (absx - degrees) ),
-        seconds = Math.floor( ( 60. * (absx - degrees) - minutes) * 100000 ) * 60 / 100000;
+        absx = Math.abs(x),
+        degrees = Math.floor(Math.abs(absx)),
+        minutes = Math.floor(60. * (absx - degrees)),
+        seconds = Math.floor((60. * (absx - degrees) - minutes) * 60);
     return sign + degrees + '° ' + minutes + "' " + seconds + '"';
 };
 

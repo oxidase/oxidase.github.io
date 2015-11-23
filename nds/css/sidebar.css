@@ -4,7 +4,7 @@
 
 #sidebar {
     position:absolute;
-    top:0;bottom:0px;right:0px;width:71px;
+    top:0;bottom:0px;right:0px;width:72px;
     overflow: hidden;
 }
 #sidebar .panel{
@@ -14,8 +14,7 @@
     top:0;bottom:0;right:0;
 }
 #sidebar .panel .button {
-    display:block;width:71px;height:71px;
-    background-image:url(../images/map30.svg);
+    display:block;width:72px;height:72px;
     background-size: 80%;
     background-repeat:no-repeat;
     background-position: center;
@@ -55,4 +54,21 @@
     border: 1px solid #ffffff;
     font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
     font-size: 16px;
+}
+
+.coordinate .button {
+    display:block;width:16px;height:16px;
+    background-size: 100%;
+    background-repeat:no-repeat;
+    background-position: center;
+    margin-left: 12px;
+    float: left;
+}
+
+.coordinate .button#remove {
+    background-image:url(../images/delete121.svg);
+}
+
+.coordinate .button#panTo {
+    background-image:url(../images/location54.svg);
 }
