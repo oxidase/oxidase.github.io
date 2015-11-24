@@ -56,6 +56,15 @@
     font-size: 16px;
 }
 
+.coordinate p {
+    margin: 0px 0px 12px 8px;
+}
+
+.coordinate p input {
+    outline: none;
+    border: none;
+    background-color: #f2f2f2;
+}
 .coordinate .button {
     display:block;width:16px;height:16px;
     background-size: 100%;
@@ -65,8 +74,13 @@
     float: left;
 }
 
+.coordinate .button:hover {
+  -webkit-filter: drop-shadow(0px 0px 4px #9cc2ce);
+  filter: drop-shadow(0px 0px 4px #9cc2ce);
+}
+
 .coordinate .button#remove {
-    background-image:url(../images/delete121.svg);
+    background-image:url(../images/cancel22.svg);
 }
 
 .coordinate .button#panTo {

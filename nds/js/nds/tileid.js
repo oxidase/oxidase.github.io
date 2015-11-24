@@ -11,7 +11,7 @@ if (typeof define !== 'function') {
     var define = require('amdefine')(module);
 }
 
-define(['exports'], function(exports){
+define(['exports'], function(exports) {
 /**
  Packed Tile IDs
   level
@@ -198,8 +198,9 @@ exports.tileid2wgs = function(tileid) {
     return [exports.nds2lon(coord[0]), level === 0 ? -90. : exports.nds2lat(coord[1])];
 };
 
-exports.coord2text = function(x) {
-    var sign = x >= 0 ? '+' : '-',
+exports.coord2text = function(x, prefix) {
+    prefix = prefix || '+-';
+    var sign = prefix[x >= 0 ? 0 : 1],
         absx = Math.abs(x),
         degrees = Math.floor(Math.abs(absx)),
         minutes = Math.floor(60. * (absx - degrees)),
@@ -227,5 +228,25 @@ exports.morton64string = function(x) {
     }
     return r.toString() + s;
 };
+
+// http://wiki.openstreetmap.org/wiki/Mercator
+var earthEquatorRadius = 6371000.; // 6378137.
+
+exports.wgs2mercatorx = function(x) {
+    return earthEquatorRadius * (x * Math.PI / 180.);
+}
+
+exports.wgs2mercatory = function(y) {
+    return earthEquatorRadius * Math.log(Math.tan(Math.PI / 4. + (y * Math.PI / 180.) / 2.));
+}
+
+exports.mercator2wgsx = function(x) {
+    return 180.0 / Math.PI * (x / earthEquatorRadius);
+}
+
+exports.mercator2wgsy = function(y) {
+    return 180.0 / Math.PI * (2. * (Math.atan(Math.exp(y / earthEquatorRadius)) - Math.PI / 4.));
+}
+
 
 });

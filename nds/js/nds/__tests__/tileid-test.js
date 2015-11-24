@@ -163,4 +163,22 @@ describe('Basic tests', function() {
                test.assert.equal(tileid.morton64string(tileid.nds2morton64(d.nds[0], d.nds[1])), d.morton);
            });
        });
+
+    leche.withData({
+        EiffelTower: {lon:2.2945, lat:48.858222, mercatorx:255136, mercatory:6243844, wgsx:2.294493172, wgsy:48.85822065},
+        StatueOfLiberty: {lon:-74.044444, lat:40.689167, mercatorx:-8233366, mercatory:4961043, wgsx:-74.04443933, wgsy:40.68916092},
+        SugarloafMountain: {lon:-43.157444, lat:-22.948658, mercatorx:-4798888, mercatory:-2622872, wgsx:-43.15743663, wgsy:-22.94865266},
+        SydneyOperaHouse: {lon:151.214189, lat:-33.857529, mercatorx:16814250, mercatory:-4005200, wgsx:151.2141831, wgsy:-33.85752227},
+        NearTheMilleniumDome: {lon:0.0, lat:51.503, mercatorx:0, mercatory:6703246, wgsx:0, wgsy:51.5029979},
+        NearQuito: {lon:-78.45, lat:0.0, mercatorx:-8723241, mercatory:0, wgsx:-78.44999105, wgsy:0},
+        Marienplatz: {lon:11.575506, lat:48.137270, mercatorx:1287137, mercatory:6122863, wgsx:11.57550114, wgsy:48.13726939}
+    }, function(d) {
+           it('should return correct spherical Mercator coordinates (truncated to int) from the WGS', function() {
+               test.assert.equal(~~tileid.wgs2mercatorx(d.lon), d.mercatorx);
+               test.assert.equal(~~tileid.wgs2mercatory(d.lat), d.mercatory);
+               test.number(tileid.mercator2wgsx(d.mercatorx)).isApprox(d.wgsx, 1e-7);
+               test.number(tileid.mercator2wgsy(d.mercatory)).isApprox(d.wgsy, 1e-7);
+           });
+       });
+
 });

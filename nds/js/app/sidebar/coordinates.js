@@ -17,16 +17,41 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         self.lng = ko.observable(lng);
         self.color = color;
 
+        self.lnglat = function (x, type) {
+            if (typeof x !== 'object' || x.length !== 2)
+                return;
+            var lng = parseFloat(x[0]), lat = parseFloat(x[1]);
+            if (isNaN(lng) || isNaN(lat))
+                return;
+            if (type === 'nds') {
+                lng = tileid.nds2lon(lng);
+                lat = tileid.nds2lat(lat);
+            } else if (type === 'mercator') {
+                lng = tileid.mercator2wgsx(lng);
+                lat = tileid.mercator2wgsy(lat);
+            }
+            self.lng(lng);
+            self.lat(lat);
+            self._marker.setLatLng([lat, lng]);
+        }
+
         self.text = ko.pureComputed({owner: self,
-            read: function () { return tileid.coord2text(self.lat()) + ", " + tileid.coord2text(self.lng()); }
+            read: function () { return tileid.coord2text(self.lat(), 'NS') + ", " + tileid.coord2text(self.lng(), 'EW'); }
         });
 
         self.wgs = ko.pureComputed({owner: self,
-            read: function () { return round8(self.lng()) + ", " + round8(self.lat()); }
+            read: function () { return round8(self.lng()) + ", " + round8(self.lat()); },
+            write: function (v) { self.lnglat(v.match(/[-+]?[0-9]*\.?[0-9]+/g)); }
         });
 
         self.nds = ko.pureComputed({owner: self,
-            read: function () { return tileid.lon2nds(self.lng()) + ", " + tileid.lat2nds(self.lat()); }
+            read: function () { return ~~(self.lng() / 90. * 0x40000000) + ", " + ~~(self.lat() / 90. * 0x40000000); },
+            write: function (v) { self.lnglat(v.match(/[-+]?[0-9]*\.?[0-9]+/g), 'nds'); }
+        });
+
+        self.mercator = ko.pureComputed({owner: self,
+            read: function () { return ~~tileid.wgs2mercatorx(self.lng()) + ", " + ~~tileid.wgs2mercatory(self.lat()); },
+            write: function (v) { self.lnglat(v.match(/[-+]?[0-9]*\.?[0-9]+/g), 'mercator'); }
         });
 
         self.morton = ko.pureComputed({owner: self,
