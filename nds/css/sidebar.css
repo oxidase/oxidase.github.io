@@ -26,7 +26,7 @@
 #sidebar .panel .button#distance {
     background-image:url(../images/distance1.svg);
 }
-#sidebar .panel .button#rectangles {
+#sidebar .panel .button#tiles {
     background-image:url(../images/multimedia-option231.svg);
 }
 #sidebar #info {
@@ -85,4 +85,10 @@
 
 .coordinate .button#panTo {
     background-image:url(../images/location54.svg);
+}
+
+/* Coordinates info page */
+
+#tileids tr.selected {
+    background-color: #9cc2ce;
 }

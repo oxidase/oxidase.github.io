@@ -36,7 +36,7 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         }
 
         self.text = ko.pureComputed({owner: self,
-            read: function () { return tileid.coord2text(self.lat(), 'NS') + ", " + tileid.coord2text(self.lng(), 'EW'); }
+            read: function () { return tileid.coord2text(self.lat(), ['N ','S ']) + ", " + tileid.coord2text(self.lng(), ['E ','W ']); }
         });
 
         self.wgs = ko.pureComputed({owner: self,
@@ -62,7 +62,7 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
             layer.removeLayer(self._marker);
         }
 
-        self._icon = L.divIcon({className: 'marker-icon icon-' + self.color, iconSize: [32, 32], iconAnchor: [12, 41]});
+        self._icon = L.divIcon({className: 'marker-icon icon-' + self.color, iconSize: [32, 32], iconAnchor: [16, 32]});
         self._marker = L.marker([lat, lng], { icon: self._icon, draggable: true }).addTo(layer);
         self._marker.on('drag', function (e) { var ll = e.target.getLatLng(); self.lat(ll.lat); self.lng(ll.lng); });
     }

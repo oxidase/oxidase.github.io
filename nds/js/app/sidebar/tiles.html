@@ -1,0 +1,15 @@
+<div id="tiles_page">
+  <span>Find tile</span><input id="find_tile" data-bind="value: findTileId, valueUpdate: 'afterkeydown'" />
+  <table>
+    <thead>
+      <tr><th>Level</th><th>Tile id</th><th>Packed id</th></tr>
+    </thead>
+    <tbody id="tileids" data-bind="foreach: ids, selectTilesLevel">
+      <tr data-bind="attr: {'id': 'tile_level_' + $index()}">
+        <td data-bind="text: $index"></td>
+        <td data-bind="text: tileid"></td>
+        <td data-bind="text: packed"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

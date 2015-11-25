@@ -9,15 +9,6 @@
 define(['leaflet', 'nds/tileid'],
 function (L, tileid) {
 
-function getLevel (bb, size) {
-    var dlat = (bb.getNorth() - bb.getSouth()),
-        dlon = (bb.getEast() - bb.getWest());
-    if (dlon > 720) return 0;
-    if (dlon > 360) return 1;
-    // TODO: make bb and size dependent
-    return Math.max(0, Math.min(15, Math.max(tileid.distance2level(dlon), tileid.distance2level(dlat)) + 2));
-}
-
 return L.GeoJSON.extend({
 
 	  includes: L.Mixin.Events,
@@ -29,26 +20,20 @@ return L.GeoJSON.extend({
 
     onAdd: function (map) {
         this._map = map;
-        this._rectTile = L.rectangle([[0,0],[0,0]], {className: 'tile'}).addTo(map);
-
         this._updateGrid();
-
-        map.on('move', this._updateGrid, this);
-        map.on('mousemove', function(event) { this._latlng = event.latlng; this._updateRect(); }, this);
+        map.on('moveend', this._updateGrid, this);
     },
 
     onRemove: function (map) {
         this.clearLayers();
-        this._map.removeLayer(this._rectTile);
-
         map.off('move', this._updateGrid, this);
-        map.off('mousemove');
     },
 
     _updateGrid: function() {
         this.clearLayers();
 
-        var bb = this._map.getBounds(), level = getLevel(bb, this._map.getSize()),
+        var level = this._map.ndsLevel(),
+            bb = this._map.getBounds(),
             dist = tileid.level2distance(level),
             tileSW = tileid.wgs2tileid(bb.getWest(), bb.getSouth(), level),
             tileNE = tileid.wgs2tileid(bb.getEast(), bb.getNorth(), level),
@@ -82,27 +67,5 @@ return L.GeoJSON.extend({
                 .addTo(this);
             }
         }
-
-        if (level !== this._level) {
-            this._level = level;
-            this._updateRect();
-
-            this.fire('level', {'level': level});
-        }
-    },
-
-    _updateRect: function() {
-        if (typeof this._latlng === 'undefined')
-            return;
-
-        var tile = tileid.wgs2tileid(this._latlng.lng, this._latlng.lat, this._level);
-        if (tile !== this._tileid) {
-            var dist = tileid.level2distance(this._level),
-                sw = tileid.tileid2wgs(tile);
-            this._tileid = tile;
-            this._rectTile.setBounds([[sw[1], sw[0]], [sw[1] + dist, sw[0] + dist]]);
-
-		        this.fire('tileid', {'id': tile});
-        }
-    }});
+    } });
 });

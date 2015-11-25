@@ -160,8 +160,16 @@ exports.morton2tile = function(x, level) {
     return 0 <= shift && shift < 32 ? x >>> shift : x;
 };
 
+exports.morton2tileid = function(x, level) {
+    return uint32((1 << (level + 16)) | exports.morton2tile(x, level));
+};
+
 exports.nds2tile = function(x, y, level) {
     return exports.morton2tile(exports.nds2morton(x >> 16, y >> 16), level);
+};
+
+exports.nds2tileid = function(x, y, level) {
+    return uint32((1 << (level + 16)) | exports.nds2tile(x, y, level));
 };
 
 exports.wgs2tile = function(x, y, level) {
@@ -169,7 +177,7 @@ exports.wgs2tile = function(x, y, level) {
 };
 
 exports.wgs2tileid = function(x, y, level) {
-    return uint32((1 << (level + 16)) | exports.nds2tile(exports.lon2nds(x), exports.lat2nds(y), level));
+    return exports.nds2tileid(exports.lon2nds(x), exports.lat2nds(y), level);
 };
 
 exports.tileid2tile = function(tileid) {
@@ -199,7 +207,7 @@ exports.tileid2wgs = function(tileid) {
 };
 
 exports.coord2text = function(x, prefix) {
-    prefix = prefix || '+-';
+    prefix = prefix || ['+','-'];
     var sign = prefix[x >= 0 ? 0 : 1],
         absx = Math.abs(x),
         degrees = Math.floor(Math.abs(absx)),

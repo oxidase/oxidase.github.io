@@ -38,21 +38,10 @@ function (L, $, ko, sidebar, tileid, TileGrid, require) {
 
 	  var map = L.map('map', {center: [48.137270, 11.575506], zoom: 15, layers: [baseLayers['Mapquest OSM']], attributionControl: false});
 
-    var tilesGrid = new TileGrid();
-    tilesGrid.addTo(map);
-
-    L.control.layers(baseLayers, {'NDS tiles': tilesGrid}, {position: 'topleft'}).addTo(map);
-    L.control.attribution({position: 'bottomleft'}).addTo(map);
-
-    sidebar(map);
-
-
-    // TODO: find better place
-    // tilesGrid.on('tileid', function (event) {console.log('tileid', event.id);});
-    // tilesGrid.on('level', function (event) {console.log('level', event.level);});
-
-    function getLevel (bb, size) {
-        var dlat = (bb.getNorth() - bb.getSouth()),
+    // NDS level
+    function getLevel () {
+        var bb = map.getBounds(),
+            dlat = (bb.getNorth() - bb.getSouth()),
             dlon = (bb.getEast() - bb.getWest());
         if (dlon > 720) return 0;
         if (dlon > 360) return 1;
@@ -60,60 +49,16 @@ function (L, $, ko, sidebar, tileid, TileGrid, require) {
         return Math.max(0, Math.min(15, Math.max(tileid.distance2level(dlon), tileid.distance2level(dlat)) + 2));
     }
 
-    function ViewModel(map) {
-        var self = this;
+    map.ndsLevel = ko.observable(getLevel());
+    map.on('zoomend', function(e) { map.ndsLevel(getLevel()); });
 
-        self.map = map;
+    // Tiles grid
+    var tilesGrid = new TileGrid();
+    tilesGrid.addTo(map);
 
-        self.tile_id = ko.observable(0);
-        self.tile_id_input = ko.observable();
-        self.zoom_level = ko.observable(11);
-        self.lat = ko.observable(0);
-        self.lng = ko.observable(0);
+    L.control.layers(baseLayers, {'NDS tiles': tilesGrid}, {position: 'topleft'}).addTo(map);
+    L.control.attribution({position: 'bottomleft'}).addTo(map);
 
-        self.tile_id_input.subscribe(function(tile_id) {
-            var level = tileid.tileid2level(tile_id);
-            if (isNaN(parseFloat(level)) || !isFinite(level) || level < 0 || level > 15)
-                return;
-            var coordSW = tileid.tileid2wgs(tile_id),
-                dist = tileid.level2distance(level),
-                rect = [[coordSW[1] - 0.5 * dist, coordSW[0] - 0.5 * dist], [coordSW[1] + 1.5 * dist, coordSW[0] + 1.5 * dist]];
-            map.fitBounds(rect);
-            self.tile_id(tile_id);
-        });
-
-        self.setTileID = function() {
-            var tile = tileid.wgs2tileid(self.lng(), self.lat(), self.zoom_level()),
-                dist = tileid.level2distance(self.zoom_level()),
-                sw = tileid.tileid2wgs(tile);
-            self.tile_id(tile);
-        }
-
-        self.setZoomLevel = function(bb) {
-            self.zoom_level(getLevel(bb));
-            self.setTileID();
-        }
-
-        self.setPoint = function(point, bb) {
-            self.zoom_level(getLevel(bb));
-            self.lng(point.lng);
-            self.lat(point.lat);
-            self.setTileID();
-        }
-    }
-
-    // initialize a view model
-    var vm = new ViewModel(map);
-
-    // set event handlers
-    map.on('zoomend', function(ev) {
-        vm.setZoomLevel(map.getBounds());
-    });
-
-    map.on('mousemove', function(ev) {
-        vm.setPoint(ev.latlng, map.getBounds());
-    });
-
-    vm.setPoint(map.getCenter(), map.getBounds());
-    ko.applyBindings(vm);
+    // Sidebar
+    sidebar(map);
 });
