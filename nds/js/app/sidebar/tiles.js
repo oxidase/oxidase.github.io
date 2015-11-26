@@ -4,7 +4,7 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
         var self = this;
 
         self.selectLevel = function () {
-            $('#tileids').find(':nth-child('+(self._map.ndsLevel()+1)+')').addClass("selected").siblings().removeClass("selected");
+            $('#tileids').find(':nth-child('+(this._map.getZoom())+')').addClass("selected").siblings().removeClass("selected");
         }
 
         self.fitTile = function (v, level) {
@@ -12,9 +12,10 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
             var dist = tileid.level2distance(level),
                 lnglat = tileid.tileid2wgs(v),
                 latlng = [lnglat[1] + 0.5 * dist, lnglat[0] + 0.5 * dist];
-            self._map.ndsLevel(level);
             self._marker.setLatLng(latlng);
-            self._map.fitBounds([[latlng[0]-1.2*dist,latlng[1]-1.2*dist],[latlng[0]+1.2*dist,latlng[1]+1.2*dist]]);
+            var p = (level === 2 ? .2 : .5);
+            self._map.fitBounds([[latlng[0] - p * dist, Math.min( 84, latlng[1] - p * dist)],
+                                 [latlng[0] + p * dist, Math.max(-84, latlng[1] + p * dist)]]);
         }
 
         self._map = map;
@@ -46,6 +47,8 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
                  return;
             self.fitTile(v, level);
         });
+
+        self._map.on('zoomend', function(e) { self.selectLevel(); });
 
         // update initial values
         self.lat(self._map.getCenter().lat);

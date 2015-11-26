@@ -32,7 +32,7 @@ return L.GeoJSON.extend({
     _updateGrid: function() {
         this.clearLayers();
 
-        var level = this._map.ndsLevel(),
+        var level = Math.max(0, Math.min(15, this._map.getZoom() - 1)),
             bb = this._map.getBounds(),
             dist = tileid.level2distance(level),
             tileSW = tileid.wgs2tileid(bb.getWest(), bb.getSouth(), level),
@@ -43,6 +43,14 @@ return L.GeoJSON.extend({
             maxLat = coordNE[1] + dist,
             minLon = bb.getWest() < -180 ? -180 : coordSW[0],
             maxLon = bb.getEast() > 180 ? 180 : coordNE[0] + dist;
+
+        if ((maxLat - minLat) * (maxLon - minLon) / dist / dist > 1000) {
+            console.warn('too many tiles', Math.floor((maxLat - minLat) * (maxLon - minLon) / dist / dist),
+                         'for the current bounding box',
+                         '['+bb.getSouth()+','+bb.getWest()+ ' '+ bb.getEast()+','+bb.getNorth()+']',
+                         'and level ' + level + '; ignoring tiles grid');
+            return;
+        }
 
         var grid = [];
         for (var lat = minLat; lat <= maxLat; lat += dist) {

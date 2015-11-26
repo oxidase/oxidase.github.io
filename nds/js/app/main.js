@@ -38,20 +38,6 @@ function (L, $, ko, sidebar, tileid, TileGrid, require) {
 
 	  var map = L.map('map', {center: [48.137270, 11.575506], zoom: 15, layers: [baseLayers['Mapquest OSM']], attributionControl: false});
 
-    // NDS level
-    function getLevel () {
-        var bb = map.getBounds(),
-            dlat = (bb.getNorth() - bb.getSouth()),
-            dlon = (bb.getEast() - bb.getWest());
-        if (dlon > 720) return 0;
-        if (dlon > 360) return 1;
-        // TODO: make bb and size dependent
-        return Math.max(0, Math.min(15, Math.max(tileid.distance2level(dlon), tileid.distance2level(dlat)) + 2));
-    }
-
-    map.ndsLevel = ko.observable(getLevel());
-    map.on('zoomend', function(e) { map.ndsLevel(getLevel()); });
-
     // Tiles grid
     var tilesGrid = new TileGrid();
     tilesGrid.addTo(map);
