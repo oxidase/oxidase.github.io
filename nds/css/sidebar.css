@@ -29,6 +29,10 @@
 #sidebar .panel .button#tiles {
     background-image:url(../images/multimedia-option231.svg);
 }
+#sidebar .panel .button#borders {
+    background-image:url(../images/geography33.svg);
+}
+
 #sidebar #info {
     display:block;
     position:absolute;
