@@ -4,18 +4,22 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
         var self = this;
 
         self.selectLevel = function () {
-            $('#tileids').find(':nth-child('+(this._map.getZoom())+')').addClass("selected").siblings().removeClass("selected");
+            $('#tileids tbody').find(':nth-child('+(this._map.getZoom())+')').addClass("selected").siblings().removeClass("selected");
+        }
+
+        self.getPackedTileId = function (row) {
+            return row.find(':nth-child(3)').text();
         }
 
         self.fitTile = function (v, level) {
+            if (typeof v === 'undefined' || v === '' || isNaN(v))
+                return;
             level = level || tileid.tileid2level(v);
             var dist = tileid.level2distance(level),
                 lnglat = tileid.tileid2wgs(v),
                 latlng = [lnglat[1] + 0.5 * dist, lnglat[0] + 0.5 * dist];
             self._marker.setLatLng(latlng);
-            var p = (level === 2 ? .2 : .5);
-            self._map.fitBounds([[latlng[0] - p * dist, Math.min( 84, latlng[1] - p * dist)],
-                                 [latlng[0] + p * dist, Math.max(-84, latlng[1] + p * dist)]]);
+            self._map.setView([latlng[0], latlng[1]], level + 1);
         }
 
         self._map = map;
@@ -37,6 +41,7 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
             }
             self.ids(ids);
             self.selectLevel();
+            $('#tileids tbody tr').dblclick(function(v) { self.fitTile(self.getPackedTileId($(this))); })
         });
         self.findTileId = ko.observable();
         self.findTileId.subscribe(function(v) {
@@ -56,17 +61,24 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
 
         this.activate = function () {
             self._map.addLayer(self._markers);
+            $('#tileids').on('keypress', this.keypress);
+            $('#tileids').focus();
         }
         this.deactivate = function () {
             self._map.removeLayer(self._markers);
+            $('#tileids').off('keypress', this.keypress);
+        }
+        this.keypress = function (event) {
+            if (event.keyCode === 38) {
+                self.fitTile(self.getPackedTileId($('#tileids tbody tr.selected').prev('tr')));
+            } else if(event.keyCode === 40) {
+                self.fitTile(self.getPackedTileId($('#tileids tbody tr.selected').next('tr')));            }
         }
 
         ko.bindingHandlers.selectTilesLevel = {
             update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
                 viewModel.selectLevel()
-                $('#tileids tr').dblclick(function(v) {
-                    self.fitTile($(this).find(':nth-child(3)').text());
-                })
+                $('#tileids tbody tr').dblclick(function(v) { self.fitTile(self.getPackedTileId($(this))); })
             }};
 
     }

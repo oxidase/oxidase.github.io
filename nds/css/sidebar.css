@@ -89,6 +89,20 @@
 
 /* Coordinates info page */
 
-#tileids tr.selected {
+#tiles_page {
+    font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
+    font-size: 16px;
+}
+
+#tileids {
+    margin-left: 10px; margin-top: 10px;
+}
+
+#tileids tr td {
+    text-align: center;
+    padding: 2px 16px 2px 16px;
+}
+
+#tileids tbody tr.selected {
     background-color: #9cc2ce;
 }
