@@ -41,7 +41,7 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
             }
             self.ids(ids);
             self.selectLevel();
-            $('#tileids tbody tr').dblclick(function(v) { self.fitTile(self.getPackedTileId($(this))); })
+            $('#tileids tbody tr').click(function(v) { self.fitTile(self.getPackedTileId($(this))); })
         });
         self.findTileId = ko.observable();
         self.findTileId.subscribe(function(v) {
@@ -78,7 +78,7 @@ define(['leaflet', 'knockout', 'jquery', 'nds/tileid'], function(L, ko, $, tilei
         ko.bindingHandlers.selectTilesLevel = {
             update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
                 viewModel.selectLevel()
-                $('#tileids tbody tr').dblclick(function(v) { self.fitTile(self.getPackedTileId($(this))); })
+                $('#tileids tbody tr').click(function(v) { self.fitTile(self.getPackedTileId($(this))); })
             }};
 
     }
