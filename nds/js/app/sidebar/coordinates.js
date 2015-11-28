@@ -56,10 +56,7 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
 
         self.morton = ko.pureComputed({owner: self,
             read: function () { return tileid.morton64string(tileid.wgs2morton64(self.lng(), self.lat())); },
-            write: function (v) {
-                console.log(tileid.string2morton64(v));
-                console.log(tileid.morton64wgs(tileid.string2morton64(v)));
-                return self.lnglat(tileid.morton64wgs(tileid.string2morton64(v))); }
+            write: function (v) { return self.lnglat(tileid.morton64wgs(tileid.string2morton64(v))); }
         });
 
         self.remove = function (layer) {
