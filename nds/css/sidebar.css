@@ -61,13 +61,14 @@
 }
 
 .coordinate p {
-    margin: 0px 0px 12px 8px;
+    margin: 0px 8px 12px 8px;
 }
 
 .coordinate p input {
     outline: none;
     border: none;
     background-color: #f2f2f2;
+    width: 100%;
 }
 .coordinate .button {
     display:block;width:16px;height:16px;

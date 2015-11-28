@@ -11,21 +11,23 @@ return function (map) {
 
     // setup sidebar buttons click handler
     $('#sidebar .button').click(function() {
+        var panelWidth = 0;
         if ($(this).hasClass('visible')) {
             // hide the info page
+            panelWidth = $(this).width();
+            $('#sidebar').width(panelWidth);
             $(this).removeClass('visible');
-            $('#sidebar').width($(this).width());
             self.visiblePage('');
         } else {
             var id = $(this).attr('id');
 
-            // hide all info pages
-            $('#sidebar .button').removeClass('visible');
-            $('#sidebar #info').children().hide();
+            // show info page
+            panelWidth = $(this).width() + $('#sidebar #info').width();
+            $('#sidebar').animate({width: panelWidth}, 100);
+            $(this).addClass('visible').siblings().removeClass('visible');
 
-            // show the info page with the id
-            $(this).addClass('visible');
-            $('#sidebar').animate({width: $(this).width() + $('#sidebar #info').width()}, 100);
+            // hide the current page
+            $('#sidebar #info').children().hide();
 
             // load #sidebar-id or show already loaded page
             var panel = $("#sidebar #info #sidebar-" + id);
@@ -41,6 +43,9 @@ return function (map) {
                 self.visiblePage(id);
             }
         }
+        // resize map
+        $("#map").width($(window).width() - panelWidth);
+        self._map.invalidateSize();
     });
 }
 

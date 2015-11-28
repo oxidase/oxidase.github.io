@@ -181,4 +181,34 @@ describe('Basic tests', function() {
            });
        });
 
+
+    leche.withData([
+        '0', '1', '42', '4294967295', '4294967296', '4294967297', '12345678901234567890', '9223372036854775808', '18446744073709551615'
+    ], function(d) {
+           it('should correctly convert string to uint64 and back', function() {
+               test.assert.equal(tileid.morton64string(tileid.string2morton64(d)), d);
+           });
+       });
+
+    leche.withData({
+        zero: {x: '18446744073709551616', y: [0,0]},
+        one: {x: '18446744078004518912', y: [1,0]},
+        two80: {x: '1208925819614629174706177', y: [0,1]}
+    }, function(d) {
+           it('should correctly overflow uint64', function() {
+               test.array(tileid.string2morton64(d.x)).is(d.y);
+           });
+       });
+
+    leche.withData([
+        '0', '1', '42', '596744332672461907', '4294967295', '4294967296', '4294967297'
+    ], function(d) {
+           it('should correctly convert morton64 to wgs84 and back', function() {
+               var wgs = tileid.morton64wgs(tileid.string2morton64(d));
+               test.object(wgs).hasLength(2);
+               test.assert.equal(tileid.morton64string(tileid.wgs2morton64(wgs[0], wgs[1])), d);
+           });
+       });
+
+
 });

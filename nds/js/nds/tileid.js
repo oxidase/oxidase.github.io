@@ -206,6 +206,18 @@ exports.tileid2wgs = function(tileid) {
     return [exports.nds2lon(coord[0]), level === 0 ? -90. : exports.nds2lat(coord[1])];
 };
 
+exports.morton64wgs = function(morton64) {
+    var lon = 0, lat = 0;
+    for (var i = 0; i < 16; ++i) {
+        var split = MortonTable16[morton64[1] & 0xf];
+        lon = lon | (split[0] << (2 * i));
+        lat = lat | (split[1] << (2 * i));
+        morton64[1] = uint32(((morton64[1] >> 4) & 0x0fffffff) | ((morton64[0] & 0xf) << 28));
+        morton64[0] = (morton64[0] >> 4);
+    }
+    return [exports.nds2lon(uint32(lon)), exports.nds2lat(uint32(lat))];
+};
+
 exports.coord2text = function(x, prefix) {
     prefix = prefix || ['+','-'];
     var sign = prefix[x >= 0 ? 0 : 1],
@@ -215,6 +227,17 @@ exports.coord2text = function(x, prefix) {
         seconds = Math.floor((60. * (absx - degrees) - minutes) * 60);
     return sign + degrees + '° ' + minutes + "' " + seconds + '"';
 };
+
+function multiplyBy(x, factor) {
+    var c = 0;
+    for (var i = x.length - 1; i > 0; --i) {
+        x[i] = x[i] * factor + c;
+        c = Math.floor(x[i] / 0x100000000);
+        x[i] = x[i] % 0x100000000;
+    }
+    x[0] = x[0] * factor + c;
+    return Math.floor(x[0] / 0x100000000);
+}
 
 function divideBy(x, divisor) {
     var r = 0, d;
@@ -227,6 +250,8 @@ function divideBy(x, divisor) {
 }
 
 exports.morton64string = function(x) {
+    if (typeof x !== 'object' || x.length != 2 || isNaN(x[0]) || isNaN(x[1]))
+        return;
     // use 1000000 because divisor must be less 2^(53-32)
     // and 4 reminders because ⌈64/log2(1000000)⌉ = 4
     var s = '', pad = '000000', z = [x[0], x[1]], r = divideBy(z, 1000000);
@@ -235,6 +260,17 @@ exports.morton64string = function(x) {
         r = divideBy(z, 1000000);
     }
     return r.toString() + s;
+};
+
+exports.string2morton64 = function(str) {
+    var x = [0, 0];
+    for (var i = 0; i < str.length; ++i) {
+        multiplyBy(x, 10);
+        x[1] += Number(str[i]);
+    }
+    x[0] = (x[0] + Math.floor(x[1] / 0x100000000)) % 0x100000000;
+    x[1] = x[1] % 0x100000000;
+    return x;
 };
 
 // http://wiki.openstreetmap.org/wiki/Mercator
@@ -255,6 +291,5 @@ exports.mercator2wgsx = function(x) {
 exports.mercator2wgsy = function(y) {
     return 180.0 / Math.PI * (2. * (Math.atan(Math.exp(y / earthEquatorRadius)) - Math.PI / 4.));
 }
-
 
 });

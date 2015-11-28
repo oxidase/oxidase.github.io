@@ -6,8 +6,8 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         return colors[Math.floor((Math.random() * colors.length))];
     }
 
-    function round8(x) {
-        return Math.abs(Math.round(100000000. * x)) / 100000000.;
+    function round6(x) {
+        return Math.sign(x) * Math.abs(Math.round(1000000. * x)) / 1000000.;
     }
 
     function Coordinate(layer, lat, lng, color) {
@@ -40,7 +40,7 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         });
 
         self.wgs = ko.pureComputed({owner: self,
-            read: function () { return round8(self.lng()) + ", " + round8(self.lat()); },
+            read: function () { return round6(self.lng()) + ", " + round6(self.lat()); },
             write: function (v) { self.lnglat(v.match(/[-+]?[0-9]*\.?[0-9]+/g)); }
         });
 
@@ -55,7 +55,11 @@ define(['leaflet', 'knockout', 'nds/tileid'], function(L, ko, tileid) {
         });
 
         self.morton = ko.pureComputed({owner: self,
-            read: function () { return tileid.morton64string(tileid.wgs2morton64(self.lng(), self.lat())); }
+            read: function () { return tileid.morton64string(tileid.wgs2morton64(self.lng(), self.lat())); },
+            write: function (v) {
+                console.log(tileid.string2morton64(v));
+                console.log(tileid.morton64wgs(tileid.string2morton64(v)));
+                return self.lnglat(tileid.morton64wgs(tileid.string2morton64(v))); }
         });
 
         self.remove = function (layer) {
