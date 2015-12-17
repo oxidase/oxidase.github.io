@@ -6,8 +6,43 @@
 
 'use strict'
 
-define(['leaflet', 'nds/tileid'],
-function (L, tileid) {
+define(['leaflet', 'nds/tileid', 'nds/distance'],
+function (L, tileid, distance) {
+
+function round(x, k) {
+    var z = Math.pow(10, k)
+    return Math.sign(x) * Math.abs(Math.round(z * x)) / z;
+}
+
+function point(lon, lat) {
+    var s = ''
+    s += '<td>' + tileid.lon2nds(lon) + ',' + tileid.lat2nds(lat) + '</td>'
+    s += '<td>' + round(lon, 6) + ',' + round(lat, 6) +  '</td>';
+    return s;
+}
+function dist(lon1, lat1, lon2, lat2) {
+    var m = distance.wgs84(lat1, lon1, lat2, lon2);
+    if (!isFinite(m))
+        return m;
+    return (m > 1200) ? round(m / 1000., 2).toString() + 'km' : round(m, 2).toString() + 'm';
+}
+
+
+function tileInfo(id) {
+    var rows = [],
+        coord = tileid.tileid2wgs(id),
+        level = tileid.tileid2level(id),
+        d = tileid.level2distance(level);
+
+    // rows.push('<th></th><th>NDS</th><th>Deg</th>');
+    rows.push('<td>SW</td>' + point(coord[0], coord[1]));
+    rows.push('<td>CP</td>' + point(coord[0]+d/2, coord[1]+d/2));
+    rows.push('<td>NE</td>' + point(coord[0]+d, coord[1]+d));
+    rows.push('<td>Top</td><td>' + dist(coord[0], coord[1]+d, coord[0]+d, coord[1]+d) +  '</td>');
+    rows.push('<td>Bottom</td><td>' + dist(coord[0], coord[1], coord[0]+d, coord[1]) +  '</td>');
+    rows.push('<td>Side</td><td>' + dist(coord[0]+d/2, coord[1], coord[0]+d/2, coord[1]+d) +  '</td>');
+    return '<table id="tile-info"><tr>' + rows.join('</tr><tr>') + '</tr></table>';
+}
 
 return L.GeoJSON.extend({
 
@@ -66,12 +101,14 @@ return L.GeoJSON.extend({
         var markers = [];
         for (var lat = minLat; lat < maxLat; lat += dist) {
             for (var lon = minLon; lon < maxLon ; lon += dist) {
+                var id = tileid.wgs2tileid(lon, lat, level);
                 L.marker([lat + dist, lon], {
                     draggable: false,
                     icon: L.divIcon({
                         className: 'tileid-labels',
                         iconSize: [0, 0], iconAnchor: [-4, -4],
-                        html: tileid.wgs2tileid(lon, lat, level)})})
+                        html: id})})
+                .bindPopup(tileInfo(id), {offset: [50,10]})
                 .addTo(this);
             }
         }

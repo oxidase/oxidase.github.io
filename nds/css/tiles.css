@@ -79,3 +79,9 @@ span#zoom_level {
     background-repeat:no-repeat;
     background-position: center;
 }
+
+#tile-info tr td {
+    text-align: center;
+    padding: 2px 4px 2px 4px;
+
+}
