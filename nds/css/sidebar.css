@@ -70,6 +70,11 @@
     background-color: #f2f2f2;
     width: 100%;
 }
+
+.coordinate p.distance {
+    font-size: 14px;
+}
+
 .coordinate .button {
     display:block;width:16px;height:16px;
     background-size: 100%;

@@ -6,6 +6,7 @@
       <p><input type="text" data-bind="textInput: nds" title="NDS coordinates"></input></p>
       <p><input type="text" data-bind="textInput: mercator" title="Spherical Mercator coordinates"></input></p>
       <p><input type="text" data-bind="textInput: morton" title="Morton code"></input></p>
+      <p class="distance">Distance <span data-bind="text: $parent.distance($index())"></span> meters</p>
       <div style="position:absolute; right:0px; top:0px">
         <a href="#" class="button" id="panTo" data-bind="click: $parent.panTo" title="View on map"></a>
         <a href="#" class="button" id="remove" data-bind="click: $parent.remove" title="Remove"></a>
