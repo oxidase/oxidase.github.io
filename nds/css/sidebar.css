@@ -1,5 +1,5 @@
 * {
-    /* border: 1px solid #000000; */
+     /* border: 1px solid #000000; */
 }
 
 #sidebar {
@@ -53,11 +53,14 @@
     padding:0; margin:0;
 }
 
+.coordinate {
+    font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
+    font-size: 16px;
+}
+
 .coordinates li.coordinate {
     list-style-type: none;
     border: 1px solid #ffffff;
-    font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
-    font-size: 16px;
 }
 
 .coordinate p {
@@ -95,6 +98,15 @@
 
 .coordinate .button#panTo {
     background-image:url(../images/location54.svg);
+}
+
+div.distance-label {
+  white-space:nowrap;
+  text-shadow: 0 0 0.1em black, 0 0 0.1em black,
+  0 0 0.1em black,0 0 0.1em black,0 0 0.1em;
+}
+text.distance-label {
+  fill: yellow
 }
 
 /* Coordinates info page */

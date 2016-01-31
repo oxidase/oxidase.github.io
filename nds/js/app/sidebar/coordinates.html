@@ -1,16 +1,19 @@
-<div class="scrollable">
-  <ul class="coordinates" data-bind="foreach: coordinates">
-    <li class="coordinate" data-bind="style: { borderColor: color }" style="position:relative">
-      <p><span data-bind="text: text"></span></p>
-      <p><input type="text" data-bind="textInput: wgs" title="WGS-84 coordinates"></input></p>
-      <p><input type="text" data-bind="textInput: nds" title="NDS coordinates"></input></p>
-      <p><input type="text" data-bind="textInput: mercator" title="Spherical Mercator coordinates"></input></p>
-      <p><input type="text" data-bind="textInput: morton" title="Morton code"></input></p>
-      <p class="distance">Distance <span data-bind="text: $parent.distance($index())"></span> meters</p>
-      <div style="position:absolute; right:0px; top:0px">
-        <a href="#" class="button" id="panTo" data-bind="click: $parent.panTo" title="View on map"></a>
-        <a href="#" class="button" id="remove" data-bind="click: $parent.remove" title="Remove"></a>
-      </div>
-    </li>
-  </ul>
+<div>
+  <span class="coordinate">Show polyline and distances<input type="checkbox" data-bind="checked: showDistances" /></span>
+  <div class="scrollable">
+    <ul class="coordinates" data-bind="foreach: coordinates">
+      <li class="coordinate" data-bind="style: { borderColor: color }" style="position:relative">
+        <p><span data-bind="text: text"></span></p>
+        <p><input type="text" data-bind="textInput: wgs" title="WGS-84 coordinates"></input></p>
+        <p><input type="text" data-bind="textInput: nds" title="NDS coordinates"></input></p>
+        <p><input type="text" data-bind="textInput: mercator" title="Spherical Mercator coordinates"></input></p>
+        <p><input type="text" data-bind="textInput: morton" title="Morton code"></input></p>
+        <!-- <p class="distance">Distance <span data-bind="text: $parent.distance($index())"></span> meters</p> -->
+        <div style="position:absolute; right:0px; top:0px">
+          <a href="#" class="button" id="panTo" data-bind="click: $parent.panTo" title="View on map"></a>
+          <a href="#" class="button" id="remove" data-bind="click: $parent.remove" title="Remove"></a>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>

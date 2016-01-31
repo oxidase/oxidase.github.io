@@ -10,6 +10,21 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
         return Math.sign(x) * Math.abs(Math.round(1000000. * x)) / 1000000.;
     }
 
+    /**
+     * Number.prototype.format(n, x, s, c)
+     *
+     * @param integer n: length of decimal
+     * @param integer x: length of whole part
+     * @param mixed   s: sections delimiter
+     * @param mixed   c: decimal delimiter
+     */
+    Number.prototype.format = function(n, x, s, c) {
+        var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',
+            num = this.toFixed(Math.max(0, ~~n));
+
+        return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
+    };
+
     function Coordinate(layer, lat, lng, color) {
         var self = this;
 
@@ -91,13 +106,25 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
         return p;
     }
 
-    function interpCoordinates(coords, npoints) {
+    function interpCoordinates(layer, coords, npoints) {
         npoints = npoints || 100;
-        var r = [];
+        var polyline = [], distances = [];
         for (var i = 1; i < coords.length; ++i) {
-            r = r.concat(interpGreatCircle([coords[i-1].lat(), coords[i-1].lng()], [coords[i].lat(), coords[i].lng()], npoints));
+            var segment = interpGreatCircle([coords[i-1].lat(), coords[i-1].lng()], [coords[i].lat(), coords[i].lng()], npoints);
+            var mid = segment[npoints/2], midM = layer.latLngToLayerPoint(segment[npoints/2-5]), midP = layer.latLngToLayerPoint(segment[npoints/2+5]);
+            var dx = midP.x-midM.x, dy = midP.y-midM.y;
+            var dir = Math.atan2(-dy, dx);
+            var dist = distance.wgs84(coords[i-1].lat(), coords[i-1].lng(), coords[i].lat(), coords[i].lng()).format(1, 3, ' ');
+
+            polyline = polyline.concat(segment);
+            distances.push({pos: mid, anchor: [50, 50], html:
+                            '<svg width="100" height="100">'
+                            + '<text x="50" y="50" text-anchor="middle" class="distance-label" '
+                            + 'transform="rotate('+ (Math.round(-180. * dir / Math.PI)) + ' 50,50) translate(0,-5)">'
+                            + dist + '</text>'
+                            + '</svg>'});
         }
-        return r;
+        return {polyline: polyline, markers: distances};
     }
 
     function CoordinatesViewModel(map) {
@@ -105,17 +132,27 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
 
         self._map = map;
         self._markers = new L.FeatureGroup();
-        self._line = null;
 
-        // poly line udpdater
+        self.showDistances = ko.observable(true);
+        self._distances = new L.FeatureGroup();
+        self._line = null;
+        self._distanceMarkers = []
+
+        // polyline and distance marks udpdater
         self.polyline = function () {
-            var p = interpCoordinates(self.coordinates(), 100);
-            if (p.length < 2)
-                return;
+            // update polyline
+            var p = interpCoordinates(self._map, self.coordinates(), 100);
             if (self._line === null) {
-                self._line = L.polyline(p).addTo(self._markers);
+                self._line = L.polyline(p.polyline, {weight:3}).addTo(self._distances);
             } else {
-                self._line.setLatLngs(p);
+                self._line.setLatLngs(p.polyline);
+            }
+            // update distance markers
+            for (var index = 0; index < Math.min(self._distanceMarkers.length, p.markers.length); ++index) {
+                var marker = p.markers[index];
+                self._distanceMarkers[index].setLatLng(marker.pos);
+                if (self._distanceMarkers[index]._icon)
+                    self._distanceMarkers[index]._icon.innerHTML = marker.html;
             }
         }
 
@@ -125,15 +162,36 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
             return target;
         };
 
-        self.coordinates = ko.observableArray([new Coordinate(self._markers, 48.137270, 11.575506, pickColor())]);
+        // subscribe to showDistances changes
+        self.showDistances.subscribe(function (v) { if (v) {
+            self._map.addLayer(self._distances);
+            self.polyline(); // force to update icon innerHTML
+        } else {
+            self._map.removeLayer(self._distances)
+        }});
+
+        // coordinate array
+        self.coordinates = ko.observableArray();
         self.coordinates.subscribe(self.polyline);
 
         self.add = function(e) {
+            // add a new empty distance marker
+            if (self.coordinates().length > 0) {
+                var icon = L.divIcon({className: 'distance-label', iconAnchor: [50,50], html: ''})
+                var marker = L.marker(self._map.getCenter(), {clickable:false, keyboard:false, zIndexOffset:-50, icon:icon}).addTo(self._distances);
+                self._distanceMarkers.push(marker);
+            }
+
             var coordinate = new Coordinate(self._markers, e.latlng.lat, e.latlng.lng, pickColor());
             self.coordinates.push(coordinate);
         }
 
         self.remove = function(coordinate) {
+            if (self._distanceMarkers.length > 0) {
+                self._distances.removeLayer(self._distanceMarkers[self._distanceMarkers.length - 1]);
+                self._distanceMarkers.splice(self._distanceMarkers.length - 1);
+            }
+
             coordinate.remove(self._markers);
             self.coordinates.remove(coordinate);
         };
@@ -142,24 +200,29 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
             self._map.panTo([coordinate.lat(), coordinate.lng()]);
         };
 
+        self.distance = function (index) {
+            var p1 = self.coordinates()[index],
+                p2 = self.coordinates()[(index + 1) % self.coordinates().length];
+            return distance.wgs84(p1.lat(), p1.lng(), p2.lat(), p2.lng()).format(1, 3, ' ');
+        }
+
         self.activate = function () {
             self._map.on('dblclick', self.add);
             self._map.addLayer(self._markers);
             self._map.doubleClickZoom.disable();
+            self.showDistances.valueHasMutated();
+            self.polyline();
         }
 
         self.deactivate = function () {
             self._map.off('dblclick', self.add);
             self._map.removeLayer(self._markers);
+            self._map.removeLayer(self._distances);
             self._map.doubleClickZoom.enable();
         }
 
-        self.distance = function (index) {
-            var p1 = self.coordinates()[index],
-                p2 = self.coordinates()[(index + 1) % self.coordinates().length],
-                d = distance.wgs84(p1.lat(), p1.lng(), p2.lat(), p2.lng());
-            return Math.round(1000 * d) / 1000;
-        }
+        // set initial state
+        self.add({latlng:{lat: 48.137270, lng: 11.575506}});
     }
 
     return CoordinatesViewModel;
