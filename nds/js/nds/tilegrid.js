@@ -15,33 +15,39 @@ function round(x, k) {
 }
 
 function point(lon, lat) {
-    var s = ''
-    s += '<td>' + tileid.lon2nds(lon) + ',' + tileid.lat2nds(lat) + '</td>'
-    s += '<td>' + round(lon, 6) + ',' + round(lat, 6) +  '</td>';
-    return s;
+    lon = tileid.lon2nds(lon);
+    lat = tileid.lat2nds(lat);
+    lon = lon >= 0x80000000 ? lon - 0x100000000 : lon;
+    lat = (lat >= 0x40000000 ? lat - 0x080000000 : lat);
+    return round(lon, 6) + ', ' + round(lat, 6);
 }
+
 function dist(lon1, lat1, lon2, lat2) {
     var m = distance.wgs84(lat1, lon1, lat2, lon2);
     if (!isFinite(m))
         return m;
-    return (m > 1200) ? round(m / 1000., 2).toString() + 'km' : round(m, 2).toString() + 'm';
+    return (m > 1200) ? round(m / 1000., 2).toString() + ' km' : round(m, 2).toString() + ' m';
 }
 
 
 function tileInfo(id) {
-    var rows = [],
-        coord = tileid.tileid2wgs(id),
+    var coord = tileid.tileid2wgs(id),
         level = tileid.tileid2level(id),
         d = tileid.level2distance(level);
 
-    // rows.push('<th></th><th>NDS</th><th>Deg</th>');
-    rows.push('<td>SW</td>' + point(coord[0], coord[1]));
-    rows.push('<td>CP</td>' + point(coord[0]+d/2, coord[1]+d/2));
-    rows.push('<td>NE</td>' + point(coord[0]+d, coord[1]+d));
-    rows.push('<td>Top</td><td>' + dist(coord[0], coord[1]+d, coord[0]+d, coord[1]+d) +  '</td>');
-    rows.push('<td>Bottom</td><td>' + dist(coord[0], coord[1], coord[0]+d, coord[1]) +  '</td>');
-    rows.push('<td>Side</td><td>' + dist(coord[0]+d/2, coord[1], coord[0]+d/2, coord[1]+d) +  '</td>');
-    return '<table id="tile-info"><tr>' + rows.join('</tr><tr>') + '</tr></table>';
+    return '<svg width="225" height="240" class="info">'
+           + '<rect x="20" y="20" width="200" height="200" style="fill:rgba(0,0,255,0.0);stroke-width:3;stroke:rgb(0,0,0)" />'
+           + '<circle cx="220" cy="20" r="4" stroke="black" stroke-width="0" fill="red" /> '
+           + '<text x="215" y="35"  text-anchor="end" >' + point(coord[0] + d, coord[1] + d) + '</text>'
+           + '<circle cx="120" cy="120" r="4" stroke="black" stroke-width="0" fill="red" />'
+           + '<text x="120" y="110" text-anchor="middle">' + point(coord[0] + d/2, coord[1] + d/2) + '</text>'
+           + '<circle cx="20" cy="220" r="4" stroke="black" stroke-width="0" fill="red" />'
+           + '<text x="25"   y="215" text-anchor="start">' + point(coord[0], coord[1]) + '</text>'
+           + '<text x="120"  y="15"  text-anchor="middle">' + dist(coord[0], coord[1]+d, coord[0]+d, coord[1]+d) + '</text>'
+           + '<text x="120"  y="235" text-anchor="middle">' + dist(coord[0], coord[1], coord[0]+d, coord[1]) + '</text>'
+           + '<text x="20"   y="120"  text-anchor="middle" transform="rotate(-90,20,120) translate(0,-5)">' + dist(coord[0], coord[1], coord[0], coord[1]+d) + '</text>'
+           + '<text x="120"  y="160" text-anchor="middle">Tile: ' + id + ', level ' + level + '</text>'
+           + '</svg>'
 }
 
 return L.GeoJSON.extend({

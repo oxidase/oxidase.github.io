@@ -89,9 +89,8 @@ exports.level2distance = function(x) {
  * full range of 32 bit signed integers. In NDS, a coordinate unit corresponds to 90/2^30 degrees of
  * longitude or latitude. Longitudes range between –180° and +180°. Hence, coordinate values are in the
  * range of –2^31 ≤ x < 2^31 for longitudes.
- *
  * @param {Number} x
- * @return {Number}
+ * @return {Number} uint32
  */
 exports.lon2nds = function(x) {
     var y = trunc( x / 90. * 0x40000000 );
@@ -106,7 +105,7 @@ exports.lon2nds = function(x) {
  * and +90°. Hence, coordinate values are in the range of –2^30 ≤ y < 2^30 for latitudes.
  *
  * @param {Number} x
- * @return {Number}
+ * @return {Number} uint31
  */
 exports.lat2nds = function(x) {
     var y = trunc( x / 90. * 0x40000000 );
