@@ -9,9 +9,9 @@ function (L, $, ko, sidebar, tileid, TileGrid, require) {
     var tiles = [
         {name: 'Mapquest OSM', url: 'http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', id: '', subdomains: '1234',
          attribution: 'Map data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>' +
-         ' | Tiles courtesy of <a href="http://www.mapquest.com">MapQuest</a>'},
+         ', Tiles courtesy of <a href="http://www.mapquest.com">MapQuest</a>'},
         {name: 'Wikimedia', url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', id: '', subdomains: 'abc',
-         attribution: 'Wikimedia maps beta | Map data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'},
+         attribution: 'Wikimedia maps beta, Map data &copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap contributors</a>'},
         {name: 'OSM', url: 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', id: '', subdomains: 'abc',
          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
          '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -33,17 +33,16 @@ function (L, $, ko, sidebar, tileid, TileGrid, require) {
     var baseLayers = {};
     for (var idx in tiles) {
         var t = tiles[idx];
-        baseLayers[t.name] = L.tileLayer(t.url, {attribution: t.attribution + ' | ' + freepik, id: t.id, subdomains: t.subdomains});
+        baseLayers[t.name] = L.tileLayer(t.url, {attribution: t.attribution + ', ' + freepik, id: t.id, subdomains: t.subdomains});
     }
 
-	  var map = L.map('map', {center: [48.137270, 11.575506], zoom: 15, layers: [baseLayers['Mapquest OSM']], attributionControl: false});
+	  var map = L.map('map', {center: [48.137270, 11.575506], zoom: 15, layers: [baseLayers['Mapquest OSM']], attributionControl: true});
+    map.attributionControl.setPosition('bottomleft');
 
     // Tiles grid
     var tilesGrid = new TileGrid();
     tilesGrid.addTo(map);
-
     L.control.layers(baseLayers, {'NDS tiles': tilesGrid}, {position: 'topleft'}).addTo(map);
-    L.control.attribution({position: 'bottomleft'}).addTo(map);
 
     // Sidebar
     sidebar(map);

@@ -106,10 +106,12 @@ div.distance-label {
   0 0 0.1em black,0 0 0.1em black,0 0 0.1em;
 }
 text.distance-label {
-  fill: yellow
+    font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
+    font-size: 16px;
+    fill: yellow
 }
 
-/* Coordinates info page */
+/* Tile IDs info page */
 
 #tiles_page {
     font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
@@ -127,4 +129,41 @@ text.distance-label {
 
 #tileids tbody tr.selected {
     background-color: #9cc2ce;
+}
+
+/* Borders info page */
+.borders {
+    font-family:FreeSans,'DejaVu Sans','Liberation Sans',Arial,sans-serif;
+    font-size: 18px;
+}
+
+.borders select {
+    width: 320px;
+}
+
+.borders p {
+    margin: 10px 0px 0px 0px;
+    padding: 0;
+}
+
+.borders .button {
+    display:block;width:16px;height:16px;
+    background-size: 100%;
+    background-repeat:no-repeat;
+    background-position: center;
+    margin-left: 12px;
+    float: left;
+}
+
+.borders .button:hover {
+  -webkit-filter: drop-shadow(0px 0px 4px #9cc2ce);
+  filter: drop-shadow(0px 0px 4px #9cc2ce);
+}
+
+.borders div .button#reload {
+    background-image:url(../images/update18.svg);
+}
+
+.borders div .button#fitBounds {
+    background-image:url(../images/square226.svg);
 }

@@ -1,7 +1,29 @@
-<div>TODO
- <!-- <button type="button" id="btn">Click Me!</button> -->
-   <div id="selects_row">
-    <select id="select_database"></select>
-    <select id="select_building_block"></select>
+<div class="borders">
+  <div style="position:absolute; right:0px; top:0px">
+    <a href="#" class="button" id="fitBounds" data-bind="click: fitBounds" title="Fit BoundsView"></a>
+    <a href="#" class="button" id="reload" data-bind="click: reload" title="Reload"></a>
+  </div>
+
+  <div data-bind="visible: availableDatabases().length > 0">
+    <p>
+      Databases
+      <select size="7" data-bind="foreach: availableDatabases, value: selectedDatabase">
+        <option data-bind="value: $index, text: name, attr: {title: name}" ></option>
+      </select>
+    </p>
+    <p>
+      Blocks
+      <select size="5" data-bind="options: availableBlocks, optionsText: 'name', value: selectedBlock" />
+    </p>
+    <p>
+      Levels
+      <select size="5" data-bind="options: availableLevels, optionsText: 'level', value: selectedLevel" />
+    </p>
+    <p>
+      <div data-bind="html: info"></div>
+    </p>
+  </div>
+  <div data-bind="visible: availableDatabases().length === 0">
+    No information retrieved
   </div>
 </div>
