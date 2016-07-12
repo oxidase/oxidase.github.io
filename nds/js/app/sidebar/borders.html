@@ -7,7 +7,7 @@
   <div data-bind="visible: availableDatabases().length > 0">
     <p>
       Databases
-      <select size="7" data-bind="foreach: availableDatabases, value: selectedDatabase">
+      <select size="15" data-bind="foreach: availableDatabases, value: selectedDatabase">
         <option data-bind="value: $index, text: name, attr: {title: name}" ></option>
       </select>
     </p>
