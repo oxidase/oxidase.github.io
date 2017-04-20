@@ -7,29 +7,97 @@
 
   <script src='./lib/mapbox-gl-dev.js'></script>
   <link href='./lib/mapbox-gl.css' rel='stylesheet' />
+  <script src="./lib/react.min.js"></script>
+  <script src="./lib/react-dom.min.js"></script>
+  <script src="./lib/resize.js"></script>
+
 
   <style>
    body { margin: 0; padding: 0; }
    html, body, #map { height: 100%; }
    canvas { position: absolute; left:0; top: 0; z-index: 10000; }
-
-   .light_major {
-       border: none;
-       cursor: pointer;
-       height: 56px;
-       width: 56px;
-       background-image: url(light_major.svg);
-       background-color: rgba(0, 0, 0, 0);
-       transform: translate(28px, 56px, 0);
-   }
   </style>
 </head>
 
 <body>
-  <div id='map'></div>
-  <canvas id="canvas" width="400" height="400" style="display:none;"></canvas>
+  <div id='map'>
+    <canvas id="canvas" width="400" height="400" style="display:none;"></canvas>
+  </div>
 
   <script>
+
+   // the following canvas example is copied from http://www.html5canvastutorials.com/tutorials/html5-canvas-exploding-dots/
+
+   var points = [], numPoints = 100, i, width, height, gravity = 0.1, emitter;
+
+   let canvas = document.getElementById('canvas');
+   const resizeCanvas = () => {
+       let parent = canvas.parentNode, styles = getComputedStyle(parent);
+       width = parseInt(styles.getPropertyValue("width"), 10);
+       height = parseInt(styles.getPropertyValue("height"), 10);
+       canvas.width = width;
+       canvas.height = height;
+   };
+
+   addResizeListener(document.getElementById('map'), resizeCanvas);
+   resizeCanvas();
+
+
+   emitter = {x:width / 2, y:0};
+
+   function initPoint(p) {
+       p.x = emitter.x;
+       p.y = emitter.y;
+       p.vx = Math.random() * 6 - 3;
+       p.vy = Math.random() * 10;
+       p.radius = Math.random() * 4 + 1;
+   }
+
+   function update() {
+       var i, point, len = points.length;
+       for(i = 0; i < len; i += 1) {
+           point = points[i];
+           point.vy -= gravity;
+           point.x += point.vx;
+           point.y += point.vy;
+           if(point.x > width ||
+              point.x < 0 ||
+              point.y > height ||
+              point.y < 0) {
+               initPoint(point);
+           }
+       }
+   }
+
+   let context = canvas.getContext("2d");
+   function draw() {
+       var i, point, len = points.length;
+       context.clearRect(0, 0, width, height);
+       for(i = 0; i < len; i += 1) {
+           point = points[i];
+           context.beginPath();
+           context.arc(point.x, point.y, point.radius, 0, Math.PI * 2, false);
+           context.fillStyle = "#f00";
+           context.fill();
+
+       }
+   }
+
+   function loop() {
+       window.requestAnimationFrame(loop);
+       addPoint();
+       update();
+       draw();
+   }
+
+   function addPoint() {
+       var point;
+       if(points.length < numPoints) {
+           point = {};
+           initPoint(point);
+           points.push(point);
+       }
+   }
 
    var mapStyle = {
        'version': 8,
@@ -42,6 +110,11 @@
            'lighthouses': {
                'type': 'geojson',
                'data': './data/lighthouses.geojson'
+           },
+           "canvas": {
+               "type": 'canvas',
+               "canvas": 'canvas',
+               "coordinates": [[0, 0], [0, 1], [1, 1], [1, 0]]
            }
        },
        'sprite': 'http://localhost:7777/assets/INT1',
@@ -95,7 +168,15 @@
                },
                // https://www.mapbox.com/mapbox-gl-js/style-spec/#types-filter
                'filter': ['in', 'seamark:type', 'light_major', 'light_minor', 'landmark']
-           }
+           },
+           {
+               'id': 'canvas',
+               'source': 'canvas',
+               'type': 'raster',
+               'paint': {'raster-opacity': 0.85},
+               'minzoom': 9,
+               'maxzoom': 22
+           },
        ]
    };
 
@@ -109,12 +190,24 @@
        zoom: 10
    });
 
+   const updateCanvas = () => {
+       const bounds = map.getBounds();
+       let source = map.getSource('canvas');
+       source.setCoordinates([bounds.getSouthWest(), bounds.getSouthEast(), bounds.getNorthEast(), bounds.getNorthWest()]);
+   };
+
 
    map.on('load', function() {
 
        /* fetch('test.json')
         *     .then(response => response.json())
         *     .then(json => console.log(json));*/
+
+       map.on('moveend', updateCanvas);
+       updateCanvas();
+
+       // initialize animation
+       loop();
    });
   </script>
 
