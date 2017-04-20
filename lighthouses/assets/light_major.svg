@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="96"
+   height="64"
+   viewBox="0 0 25.400002 16.933334"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="light_major.svg"
+   inkscape:version="0.92.1 r15371"
+   inkscape:export-filename="/home/miha/notes/oxidase.github.io/lighthouses/light_major.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="8"
+     inkscape:cx="36.045266"
+     inkscape:cy="21.421038"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:measure-start="64,65.7812"
+     inkscape:measure-end="55.4687,65.0937"
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     units="px"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="12.700001,17.197918"
+       orientation="1,0"
+       id="guide8130"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="2.359546,8.4666671"
+       orientation="0,1"
+       id="guide8132"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-68.711568,-120.67431)">
+    <path
+       style="opacity:0.98000004;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.09859592;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 81.411569,125.57365 -0.783448,2.46557 -2.475217,-8.1e-4 1.991045,1.54423 -0.765609,2.47164 2.013921,-1.51106 2.001959,1.52849 -0.746301,-2.47837 2.003008,-1.52702 -2.475218,-0.0206 z m -0.0097,2.57386 a 1.0153125,1.0153125 0 0 1 1.015357,1.01536 1.0153125,1.0153125 0 0 1 -1.015357,1.01536 1.0153125,1.0153125 0 0 1 -1.015353,-1.01536 1.0153125,1.0153125 0 0 1 1.015353,-1.01536 z"
+       id="path4488"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#ff00ff;fill-rule:evenodd;stroke:none;stroke-width:0.10745391px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 83.777535,131.01402 c 0,0 7.695537,2.7339 9.253383,3.46665 2.277786,1.07135 0.564067,4.09944 -1.624482,2.81371 -1.625988,-0.95522 -7.628901,-6.28036 -7.628901,-6.28036 z"
+       id="path4494"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cssc" />
+    <circle
+       style="opacity:0.98000004;fill:#ff00ff;fill-opacity:1;stroke:none;stroke-width:0.4449586;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path5137"
+       cx="81.401962"
+       cy="129.1629"
+       r="0.40612498" />
+  </g>
+</svg>

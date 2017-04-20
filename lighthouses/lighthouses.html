@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mapbox GL JS debug page</title>
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src='./lib/mapbox-gl-dev.js'></script>
+  <link href='./lib/mapbox-gl.css' rel='stylesheet' />
+
+  <style>
+   body { margin: 0; padding: 0; }
+   html, body, #map { height: 100%; }
+   canvas { position: absolute; left:0; top: 0; z-index: 10000; }
+
+   .light_major {
+       border: none;
+       cursor: pointer;
+       height: 56px;
+       width: 56px;
+       background-image: url(light_major.svg);
+       background-color: rgba(0, 0, 0, 0);
+       transform: translate(28px, 56px, 0);
+   }
+  </style>
+</head>
+
+<body>
+  <div id='map'></div>
+  <canvas id="canvas" width="400" height="400" style="display:none;"></canvas>
+
+  <script>
+
+   var mapStyle = {
+       'version': 8,
+       'name': 'Dark',
+       'sources': {
+           'mapbox': {
+               'type': 'vector',
+               'url': 'mapbox://mapbox.mapbox-streets-v6'
+           },
+           'lighthouses': {
+               'type': 'geojson',
+               'data': './data/lighthouses.geojson'
+           }
+       },
+       'sprite': 'http://localhost:7777/assets/INT1',
+       'glyphs': 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+       'layers': [
+           {
+               'id': 'background',
+               'type': 'background',
+               'paint': {'background-color': 'hsl(55, 11%, 96%)'}
+           },
+           {
+               'id': 'water',
+               'source': 'mapbox',
+               'source-layer': 'water',
+               'type': 'fill',
+               'paint': {'fill-color': 'hsl(185, 9%, 81%)'}
+           },
+           {
+               'id': 'boundaries',
+               'source': 'mapbox',
+               'source-layer': 'admin',
+               'type': 'line',
+               'paint': {'line-color': '#797979', 'line-dasharray': [2, 2, 6, 2]},
+               'filter': ['all', ['==', 'maritime', 0]]
+           },
+           {
+               'id': 'naval_boundaries',
+               'source': 'mapbox',
+               'source-layer': 'admin',
+               'type': 'line',
+               'paint': {'line-color': '#b92dce', 'line-width': 3, 'line-opacity': 0.4},
+               'filter': ['all', ['==', 'maritime', 1]]
+           },
+           {
+               'id': 'other_seamarks',
+               'source': 'lighthouses',
+               'type': 'circle',
+               'paint': {'circle-radius': 3, 'circle-color': '#8B88B6'},
+               'filter': ['!in', 'seamark:type', 'light_major', 'light_minor', 'landmark']
+           },
+           {
+               'id': 'lighthouses',
+               'source': 'lighthouses',
+               'type': 'symbol',
+               'layout': {
+                   'icon-image': '{seamark:type}',
+                   'text-field': '{name}',
+                   'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                   'text-offset': [0, -1.2],
+                   'text-anchor': 'bottom'
+               },
+               // https://www.mapbox.com/mapbox-gl-js/style-spec/#types-filter
+               'filter': ['in', 'seamark:type', 'light_major', 'light_minor', 'landmark']
+           }
+       ]
+   };
+
+   mapboxgl.accessToken = 'pk.eyJ1IjoibGJ1ZCIsImEiOiJCVTZFMlRRIn0.0ZQ4d9-WZrekVy7ML89P4A';
+   var map = new mapboxgl.Map({
+       container: 'map',
+       minZoom: 0,
+       style: mapStyle,
+       hash: false,
+       center: [10.2736833, 54.4996167],
+       zoom: 10
+   });
+
+
+   map.on('load', function() {
+
+       /* fetch('test.json')
+        *     .then(response => response.json())
+        *     .then(json => console.log(json));*/
+   });
+  </script>
+
+</body>
+</html>

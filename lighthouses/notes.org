@@ -1,0 +1,21 @@
+npm install -g geojsonio-cli
+npm install -g query-overpass
+curl -sg 'http://overpass-api.de/api/interpreter?data=[out:json];(node["man_made"="lighthouse"];>;);out;'
+echo '[out:json];(node["man_made"="lighthouse"];>;);out;' | query-overpass --flat-properties > lighthouses.geojson
+tippecanoe -o lighthouses.mbtiles lighthouses.json
+
+https://github.com/mapbox/spritezero-cli
+
+http://wiki.openstreetmap.org/wiki/Seamarks/INT-1_Section_P
+http://wiki.openstreetmap.org/wiki/Smrender
+
+http://bl.ocks.org/lbud/a1f6e07528cc62317309c0da5f00f3a2
+
+https://www.mapbox.com/blog/data-driven-style-remote-sources/
+https://www.mapbox.com/help/define-dataset/
+https://www.mapbox.com/help/studio-manual-datasets/
+https://www.mapbox.com/blog/dataset-api-public-launch/
+https://www.mapbox.com/mapbox-gl-js/style-spec/#sprite
+
+
+convert light_major.png light_minor.png landmark.png -append INT1.png
