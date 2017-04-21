@@ -26,53 +26,58 @@
 
   <script>
 
-   // the following canvas example is copied from http://www.html5canvastutorials.com/tutorials/html5-canvas-exploding-dots/
 
-   var points = [], numPoints = 100, i, width, height, gravity = 0.1, emitter;
-
+   // -----
+   // Canvas resizing and 2D context
    let canvas = document.getElementById('canvas');
    const resizeCanvas = () => {
-       let parent = canvas.parentNode, styles = getComputedStyle(parent);
-       width = parseInt(styles.getPropertyValue("width"), 10);
-       height = parseInt(styles.getPropertyValue("height"), 10);
+       let parent = canvas.parentNode, styles = getComputedStyle(parent),
+           width = parseInt(styles.getPropertyValue("width"), 10),
+           height = parseInt(styles.getPropertyValue("height"), 10);
        canvas.width = width;
        canvas.height = height;
    };
-
    addResizeListener(document.getElementById('map'), resizeCanvas);
    resizeCanvas();
 
+   let context = canvas.getContext("2d");
 
-   emitter = {x:width / 2, y:0};
+
+   // -----
+   // the following canvas example is copied from http://www.html5canvastutorials.com/tutorials/html5-canvas-exploding-dots/
+   let points = [], numPoints = 100, i, gravity = 0.1;
 
    function initPoint(p) {
-       p.x = emitter.x;
-       p.y = emitter.y;
+       p.x = canvas.width / 2;
+       p.y = 0;
        p.vx = Math.random() * 6 - 3;
        p.vy = Math.random() * 10;
        p.radius = Math.random() * 4 + 1;
    }
 
-   function update() {
+   function updateDots() {
        var i, point, len = points.length;
        for(i = 0; i < len; i += 1) {
            point = points[i];
            point.vy -= gravity;
            point.x += point.vx;
            point.y += point.vy;
-           if(point.x > width ||
+           if(point.x > canvas.width ||
               point.x < 0 ||
-              point.y > height ||
+              point.y > canvas.height ||
               point.y < 0) {
                initPoint(point);
            }
        }
+       if(len < numPoints) {
+           point = {};
+           initPoint(point);
+           points.push(point);
+       }
    }
 
-   let context = canvas.getContext("2d");
-   function draw() {
+   function drawDots() {
        var i, point, len = points.length;
-       context.clearRect(0, 0, width, height);
        for(i = 0; i < len; i += 1) {
            point = points[i];
            context.beginPath();
@@ -83,20 +88,29 @@
        }
    }
 
-   function loop() {
-       window.requestAnimationFrame(loop);
-       addPoint();
-       update();
-       draw();
+   // -----
+   // Lighthouses animation
+   let lighthouses = null, visible_lighthouses = [];
+
+   function updateLighthouses(timestamp) {
    }
 
-   function addPoint() {
-       var point;
-       if(points.length < numPoints) {
-           point = {};
-           initPoint(point);
-           points.push(point);
+   function drawLighthouses() {
+   }
+
+   // -----
+   // Anmation loop
+   let prevTimestamp = null;
+   function loop(timestamp) {
+       updateDots();
+       updateLighthouses();
+       if (timestamp - prevTimestamp > 50) {
+           context.clearRect(0, 0, canvas.width, canvas.height);
+           drawDots();
+           drawLighthouses();
+           prevTimestamp = timestamp;
        }
+       window.requestAnimationFrame(loop);
    }
 
    var mapStyle = {
@@ -109,7 +123,7 @@
            },
            'lighthouses': {
                'type': 'geojson',
-               'data': './data/lighthouses.geojson'
+               'data': './data/lighthouses_kiel.geojson'
            },
            "canvas": {
                "type": 'canvas',
@@ -199,15 +213,16 @@
 
    map.on('load', function() {
 
-       /* fetch('test.json')
-        *     .then(response => response.json())
-        *     .then(json => console.log(json));*/
+       let source = map.getSource('lighthouses');
+       fetch(source.serialize().data)
+           .then(response => response.json())
+           .then(json => lighthouses = json);
 
        map.on('moveend', updateCanvas);
        updateCanvas();
 
        // initialize animation
-       loop();
+       loop(performance.now());
    });
   </script>
 

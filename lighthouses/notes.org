@@ -2,6 +2,7 @@ npm install -g geojsonio-cli
 npm install -g query-overpass
 curl -sg 'http://overpass-api.de/api/interpreter?data=[out:json];(node["man_made"="lighthouse"];>;);out;'
 echo '[out:json];(node["man_made"="lighthouse"];>;);out;' | query-overpass --flat-properties > lighthouses.geojson
+echo '[out:json];(node(330119702);>;);out;' | query-overpass --flat-properties > lighthouses_kiel.geojson
 tippecanoe -o lighthouses.mbtiles lighthouses.json
 
 https://github.com/mapbox/spritezero-cli
