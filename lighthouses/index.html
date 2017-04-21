@@ -7,11 +7,8 @@
 
   <script src='./lib/mapbox-gl-dev.js'></script>
   <link href='./lib/mapbox-gl.css' rel='stylesheet' />
-  <script src="./lib/react.min.js"></script>
-  <script src="./lib/react-dom.min.js"></script>
   <script src="./lib/resize.js"></script>
   <script src="./lib/turf.js"></script>
-
 
   <style>
    body { margin: 0; padding: 0; }
@@ -145,21 +142,21 @@
            // Fixed Light
            return renderingColors[color];
        } else if (character === 'FFl') {
-
+           return 'black';
        } else if (character === 'Fl' || character === 'jFl') {
            // Flashing Light
            const step = getStep(timestamp % prop[prefix + 'period'], prop[prefix + 'sequence']);
            return step === null ? null : renderingColors[color];
        } else if (character === 'IQ') {
-
+           return 'black';
        } else if (character === 'Iso' || character === 'ISO') {
            // Isophased Light
            const period = prop.hasOwnProperty(prefix + 'period') ? prop[prefix + 'period'] : 2;
            return (timestamp % period ) < (period / 2) ? renderingColors[color] : null;
        } else if (character === 'IVQ') {
-
+           return 'black';
        } else if (character === 'LFI') {
-
+           return 'black';
        } else if (character === 'LFl' || character === 'long_flashing') {
            // Long Flash Light
            const period = prop.hasOwnProperty(prefix + 'period') ? prop[prefix + 'period'] : 15,
@@ -173,14 +170,14 @@
            const step = getStep(timestamp % prop[prefix + 'period'], prop[prefix + 'sequence']);
            return step === null ? null : renderingColors[color];
        } else if (character === 'Q') {
-
+           return 'black';
        } else if (character === 'Q+LFl') {
-
+           return 'black';
        } else if (character === 'VQ') {
-
+           return 'black';
        }
 
-       return 'black'; // TODO unimpleneted lights fallback
+       return renderingColors[color];
    };
 
 
