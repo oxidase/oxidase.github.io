@@ -91,18 +91,18 @@
 
    // -----
    // Canvas resizing and 2D context
-   let canvas = document.getElementById('canvas');
+   let map_canvas = document.getElementById('canvas');
    const resizeCanvas = () => {
-       let parent = canvas.parentNode, styles = getComputedStyle(parent),
+       let parent = map_canvas.parentNode, styles = getComputedStyle(parent),
            width = parseInt(styles.getPropertyValue("width"), 10),
            height = parseInt(styles.getPropertyValue("height"), 10);
-       canvas.width = width;
-       canvas.height = height;
+       map_canvas.width = width;
+       map_canvas.height = height;
    };
    addResizeListener(document.getElementById('map'), resizeCanvas);
    resizeCanvas();
 
-   let context = canvas.getContext("2d");
+   let context = map_canvas.getContext("2d");
 
 
    // -----
@@ -110,7 +110,7 @@
    let points = [], numPoints = 100, i, gravity = 0.1;
 
    function initPoint(p) {
-       p.x = canvas.width / 2;
+       p.x = map_canvas.width / 2;
        p.y = 0;
        p.vx = Math.random() * 6 - 3;
        p.vy = Math.random() * 10;
@@ -124,9 +124,9 @@
            point.vy -= gravity;
            point.x += point.vx;
            point.y += point.vy;
-           if(point.x > canvas.width ||
+           if(point.x > map_canvas.width ||
               point.x < 0 ||
-              point.y > canvas.height ||
+              point.y > map_canvas.height ||
               point.y < 0) {
                initPoint(point);
            }
@@ -156,13 +156,13 @@
 
    let getXY = point => {
        const bounds = map.getBounds();
-       return [ canvas.width * (point[0] - bounds.getWest()) / (bounds.getEast() - bounds.getWest()),
-                canvas.height * (point[1] - bounds.getSouth()) / (bounds.getNorth() - bounds.getSouth())];
+       return [ map_canvas.width * (point[0] - bounds.getWest()) / (bounds.getEast() - bounds.getWest()),
+                map_canvas.height * (point[1] - bounds.getSouth()) / (bounds.getNorth() - bounds.getSouth())];
    };
 
    let getDistance = distance => {
        const bounds = map.getBounds();
-       return canvas.width * distance / (bounds.getNorth() - bounds.getSouth());
+       return map_canvas.width * distance / (bounds.getNorth() - bounds.getSouth());
    };
 
    const renderingColors = { 'white': '#ffff00', 'red': '#ff0000', 'green': '#00ff00', 'blue': '#0000ff', 'yellow': '#ffff00',
@@ -307,7 +307,7 @@
    function loop(timestamp) {
        //updateDots();
        if (timestamp - prevTimestamp > 0) {
-           context.clearRect(0, 0, canvas.width, canvas.height);
+           context.clearRect(0, 0, map_canvas.width, map_canvas.height);
            //drawDots();
            drawLighthouses(timestamp);
            prevTimestamp = timestamp;
