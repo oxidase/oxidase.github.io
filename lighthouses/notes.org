@@ -3,7 +3,7 @@ npm install -g query-overpass
 curl -sg 'http://overpass-api.de/api/interpreter?data=[out:json];(node["man_made"="lighthouse"];>;);out;'
 echo '[out:json];(node["man_made"="lighthouse"];>;);out;' | query-overpass --flat-properties > lighthouses.geojson
 echo '[out:json];(node(330119702);>;);out;' | query-overpass --flat-properties > lighthouses_kiel.geojson
-echo '[out:json];(node(330119702);>;);out;(node(2651078254);>;);out;(node(538969144);>;);out;(node(1460052772);>;);out;(node(32564162);>;);out;(node(269331345);>;);out;' | query-overpass --flat-properties > lighthouses_kiel.geojson
+echo '[out:json];(node(330119702);>;);out;(node(2651078254);>;);out;(node(538969144);>;);out;(node(1460052772);>;);out;(node(32564162);>;);out;(node(269331345);>;);out;(node(32564163);>;);out;out;(node(280348783);>;);out;' | query-overpass --flat-properties > lighthouses_kiel.geojson
 tippecanoe -o lighthouses.mbtiles lighthouses.json
 
 https://github.com/mapbox/spritezero-cli
@@ -21,3 +21,5 @@ https://www.mapbox.com/mapbox-gl-js/style-spec/#sprite
 
 
 convert light_major.png light_minor.png landmark.png -append INT1.png
+
+http://wiki.openstreetmap.org/wiki/Seamarks/Lights

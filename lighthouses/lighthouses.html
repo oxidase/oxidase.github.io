@@ -107,199 +107,267 @@
    const renderingColors = { 'white': '#ffff00', 'red': '#ff0000', 'green': '#00ff00', 'blue': '#0000ff', 'yellow': '#ffff00',
                              'amber': 'orange', 'violet': 'violet',  'orange': 'orange', 'magenta': 'magenta'};
 
-   let getColor = (timestamp, prop, prefix) => {
-       const character = prop[prefix + 'character'],
-             period = prop[prefix + 'period'],
-             color = prop[prefix + 'colour'];
-
-       //console.log(character, period, color);
-       if (character === 'Al' || character === 'Al.Iso') {
-           return renderingColors[color.split(';')[1]];
+   let getStep = (time, sequence) => {
+       //console.log(time, sequence);
+       let patt = /([0-9]+(\.[0-9]*)?|\.[0-9]+)/igm, t = 0., step = 0;
+       while (match = patt.exec(sequence)) {
+           /* if (step % 2 === 1 && (patt.lastIndex >= sequence.length || sequence[patt.lastIndex] !== ')')) {
+            *     console.error('bad sequence string' + sequence);
+            *     return null;
+            * }*/
+           const phase_duration = Number(match[0]);
+           //console.log(step, phase_duration)
+           if (t <= time && time < t + phase_duration)
+               return step % 2 === 1 ? null : step / 2;
+           step += 1;
+           t += phase_duration;
        }
-       return renderingColors[color];
+       return null;
+   };
+
+   let getColor = (timestamp, prop, prefix) => {
+       const character = prop[prefix + 'character'];
+       const color = prop[prefix + 'colour'];
+
+       // http://wiki.openstreetmap.org/wiki/Seamarks/Lights
+       // http://wiki.openstreetmap.org/wiki/Seamarks/Light_Characters
+       if (character === 'Al' || character === 'alternating') {
+           // Alternating Light
+           const colors = color.split(';'),
+                 period = prop.hasOwnProperty(prefix + 'period') ? prop[prefix + 'period'] : 2,
+                 step = Math.floor((colors.length * (timestamp % period) / period));
+           return renderingColors[colors[step]];
+       } else if (character === 'Al.Fl') {
+       } else if (character === 'Al.Iso') {
+       } else if (character === 'Al.LFl') {
+       } else if (character === 'Al.Oc') {
+       } else if (character === 'F') {
+           // Fixed Light
+           return renderingColors[color];
+       } else if (character === 'FFl') {
+
+       } else if (character === 'Fl' || character === 'jFl') {
+           // Flashing Light
+           const step = getStep(timestamp % prop[prefix + 'period'], prop[prefix + 'sequence']);
+           return step === null ? null : renderingColors[color];
+       } else if (character === 'IQ') {
+
+       } else if (character === 'Iso' || character === 'ISO') {
+           // Isophased Light
+           const period = prop.hasOwnProperty(prefix + 'period') ? prop[prefix + 'period'] : 2;
+           return (timestamp % period ) < (period / 2) ? renderingColors[color] : null;
+       } else if (character === 'IVQ') {
+
+       } else if (character === 'LFI') {
+
+       } else if (character === 'LFl' || character === 'long_flashing') {
+           // Long Flash Light
+           const period = prop.hasOwnProperty(prefix + 'period') ? prop[prefix + 'period'] : 15,
+                 group = prop.hasOwnProperty(prefix + 'group') ? prop[prefix + 'group'] : period / 4;
+           return (timestamp % period ) < group ? renderingColors[color] : null;
+       } else if (character === 'Mo') {
+           const step = getStep(timestamp % prop[prefix + 'period'], prop[prefix + 'sequence']);
+           return step === null ? null : renderingColors[color];
+       } else if (character === 'Oc' || character === 'rear' /* data bug in 854975740 */) {
+           // Occulting Light
+           const step = getStep(timestamp % prop[prefix + 'period'], prop[prefix + 'sequence']);
+           return step === null ? null : renderingColors[color];
+       } else if (character === 'Q') {
+
+       } else if (character === 'Q+LFl') {
+
+       } else if (character === 'VQ') {
+
+       }
+
+       return 'black'; // error fallback
    };
 
 
-           function drawLightArc(timestamp, prop, center, prefix) {
-               const color = getColor(timestamp, prop, prefix);
-               if (color !== null) {
-                   let sector_start = prop.hasOwnProperty(prefix + 'orientation') ? prop[prefix + 'orientation'] - 3: prop[prefix + 'sector_start'],
-                       sector_end = prop.hasOwnProperty(prefix + 'orientation') ? prop[prefix + 'orientation'] + 3: prop[prefix + 'sector_end'],
-                       radius = getDistance(prop.hasOwnProperty(prefix + 'radius') ? prop[prefix + 'radius'] / 60. : 1. / 60);
+   function drawLightArc(timestamp, prop, center, prefix) {
+       const color = getColor(timestamp / 1000, prop, prefix);
+       if (color !== null) {
+           let sector_start = prop.hasOwnProperty(prefix + 'orientation') ? prop[prefix + 'orientation'] - 3: prop[prefix + 'sector_start'],
+               sector_end = prop.hasOwnProperty(prefix + 'orientation') ? prop[prefix + 'orientation'] + 3: prop[prefix + 'sector_end'],
+               radius = getDistance(prop.hasOwnProperty(prefix + 'radius') ? prop[prefix + 'radius'] / 60. : 1. / 60);
 
-                   sector_start = Math.PI * (270 - sector_start) / 180.;
-                   sector_end = Math.PI * (270 - sector_end) / 180.;
+           sector_start = Math.PI * (270 - sector_start) / 180.;
+           sector_end = Math.PI * (270 - sector_end) / 180.;
 
-                   context.beginPath();
-                   context.arc(center[0], center[1], radius, sector_start, sector_end, true);
-                   context.lineWidth = 7;
-                   context.strokeStyle = color;
-                   context.stroke();
+           context.beginPath();
+           context.arc(center[0], center[1], radius, sector_start, sector_end, true);
+           context.lineWidth = 7;
+           context.strokeStyle = color;
+           context.stroke();
+       }
+   }
+
+   function drawLighthouses(timestamp) {
+       for (let i in visible_lighthouses.features) {
+           const lighthouse = visible_lighthouses.features[i];
+           const prop = lighthouse.properties;
+           const center = getXY(lighthouse.geometry.coordinates);
+
+           if (prop.hasOwnProperty('seamark:light:colour')) {
+               drawLightArc(timestamp, prop, center, 'seamark:light:');
+           } else {
+               for (let light = 1, prefix = `seamark:light:${light}:`;
+                   prop.hasOwnProperty(prefix + 'colour'); ++light, prefix = `seamark:light:${light}:`) {
+                   drawLightArc(timestamp, prop, center, prefix);
                }
            }
+       }
+   }
 
-           function drawLighthouses(timestamp) {
-               for (let i in visible_lighthouses.features) {
-                   const lighthouse = visible_lighthouses.features[i];
-                   const prop = lighthouse.properties;
-                   const center = getXY(lighthouse.geometry.coordinates);
+   // -----
+   // Anmation loop
+   let prevTimestamp = null;
+   function loop(timestamp) {
+       updateDots();
+       if (timestamp - prevTimestamp > 0) {
+           context.clearRect(0, 0, canvas.width, canvas.height);
+           drawDots();
+           drawLighthouses(timestamp);
+           prevTimestamp = timestamp;
+       }
+       window.requestAnimationFrame(loop);
+   }
 
-                   if (prop.hasOwnProperty('seamark:light:colour')) {
-                       drawLightArc(timestamp, prop, center, 'seamark:light:');
-                   } else {
-                       for (let light = 1, prefix = `seamark:light:${light}:`;
-                           prop.hasOwnProperty(prefix + 'colour'); ++light, prefix = `seamark:light:${light}:`) {
-                           drawLightArc(timestamp, prop, center, prefix);
-                       }
-                   }
-               }
+   var mapStyle = {
+       'version': 8,
+       'name': 'Dark',
+       'sources': {
+           'mapbox': {
+               'type': 'vector',
+               'url': 'mapbox://mapbox.mapbox-streets-v6'
+           },
+           'lighthouses': {
+               'type': 'geojson',
+               //'data': './data/lighthouses_kiel.geojson'
+               'data': './data/lighthouses.geojson'
+           },
+           "canvas": {
+               "type": 'canvas',
+               "canvas": 'canvas',
+               "coordinates": [[0, 0], [0, 1], [1, 1], [1, 0]]
            }
-
-           // -----
-           // Anmation loop
-           let prevTimestamp = null;
-           function loop(timestamp) {
-               updateDots();
-               if (timestamp - prevTimestamp > 0) {
-                   context.clearRect(0, 0, canvas.width, canvas.height);
-                   drawDots();
-                   drawLighthouses(timestamp);
-                   prevTimestamp = timestamp;
-               }
-               window.requestAnimationFrame(loop);
-           }
-
-           var mapStyle = {
-               'version': 8,
-               'name': 'Dark',
-               'sources': {
-                   'mapbox': {
-                       'type': 'vector',
-                       'url': 'mapbox://mapbox.mapbox-streets-v6'
-                   },
-                   'lighthouses': {
-                       'type': 'geojson',
-                       'data': './data/lighthouses_kiel.geojson'
-                       //'data': './data/lighthouses.geojson'
-                   },
-                   "canvas": {
-                       "type": 'canvas',
-                       "canvas": 'canvas',
-                       "coordinates": [[0, 0], [0, 1], [1, 1], [1, 0]]
-                   }
+       },
+       'sprite': 'http://localhost:7777/assets/INT1',
+       'glyphs': 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+       'layers': [
+           {
+               'id': 'background',
+               'type': 'background',
+               'paint': {'background-color': 'hsl(55, 11%, 96%)'}
+           },
+           {
+               'id': 'water',
+               'source': 'mapbox',
+               'source-layer': 'water',
+               'type': 'fill',
+               'paint': {'fill-color': 'hsl(185, 9%, 81%)'}
+           },
+           {
+               'id': 'boundaries',
+               'source': 'mapbox',
+               'source-layer': 'admin',
+               'type': 'line',
+               'paint': {'line-color': '#797979', 'line-dasharray': [2, 2, 6, 2]},
+               'filter': ['all', ['==', 'maritime', 0]]
+           },
+           {
+               'id': 'naval_boundaries',
+               'source': 'mapbox',
+               'source-layer': 'admin',
+               'type': 'line',
+               'paint': {'line-color': '#b92dce', 'line-width': 3, 'line-opacity': 0.4},
+               'filter': ['all', ['==', 'maritime', 1]]
+           },
+           {
+               'id': 'other_seamarks',
+               'source': 'lighthouses',
+               'type': 'circle',
+               'paint': {'circle-radius': 3, 'circle-color': '#8B88B6'},
+               'filter': ['!in', 'seamark:type', 'light_major', 'light_minor', 'landmark']
+           },
+           {
+               'id': 'lighthouses',
+               'source': 'lighthouses',
+               'type': 'symbol',
+               'layout': {
+                   'icon-image': '{seamark:type}',
+                   'text-field': '{name}',
+                   'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                   'text-offset': [0, -1.2],
+                   'text-anchor': 'bottom'
                },
-               'sprite': 'http://localhost:7777/assets/INT1',
-               'glyphs': 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
-               'layers': [
-                   {
-                       'id': 'background',
-                       'type': 'background',
-                       'paint': {'background-color': 'hsl(55, 11%, 96%)'}
-                   },
-                   {
-                       'id': 'water',
-                       'source': 'mapbox',
-                       'source-layer': 'water',
-                       'type': 'fill',
-                       'paint': {'fill-color': 'hsl(185, 9%, 81%)'}
-                   },
-                   {
-                       'id': 'boundaries',
-                       'source': 'mapbox',
-                       'source-layer': 'admin',
-                       'type': 'line',
-                       'paint': {'line-color': '#797979', 'line-dasharray': [2, 2, 6, 2]},
-                       'filter': ['all', ['==', 'maritime', 0]]
-                   },
-                   {
-                       'id': 'naval_boundaries',
-                       'source': 'mapbox',
-                       'source-layer': 'admin',
-                       'type': 'line',
-                       'paint': {'line-color': '#b92dce', 'line-width': 3, 'line-opacity': 0.4},
-                       'filter': ['all', ['==', 'maritime', 1]]
-                   },
-                   {
-                       'id': 'other_seamarks',
-                       'source': 'lighthouses',
-                       'type': 'circle',
-                       'paint': {'circle-radius': 3, 'circle-color': '#8B88B6'},
-                       'filter': ['!in', 'seamark:type', 'light_major', 'light_minor', 'landmark']
-                   },
-                   {
-                       'id': 'lighthouses',
-                       'source': 'lighthouses',
-                       'type': 'symbol',
-                       'layout': {
-                           'icon-image': '{seamark:type}',
-                           'text-field': '{name}',
-                           'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
-                           'text-offset': [0, -1.2],
-                           'text-anchor': 'bottom'
-                       },
-                       // https://www.mapbox.com/mapbox-gl-js/style-spec/#types-filter
-                       'filter': ['in', 'seamark:type', 'light_major', 'light_minor', 'landmark']
-                   },
-                   {
-                       'id': 'canvas',
-                       'source': 'canvas',
-                       'type': 'raster',
-                       'paint': {'raster-opacity': 0.85},
-                       'minzoom': 9,
-                       'maxzoom': 24
-                   },
-               ]
-           };
+               // https://www.mapbox.com/mapbox-gl-js/style-spec/#types-filter
+               'filter': ['in', 'seamark:type', 'light_major', 'light_minor', 'landmark']
+           },
+           {
+               'id': 'canvas',
+               'source': 'canvas',
+               'type': 'raster',
+               'paint': {'raster-opacity': 0.85},
+               'minzoom': 9,
+               'maxzoom': 24
+           },
+       ]
+   };
 
-           mapboxgl.accessToken = 'pk.eyJ1IjoibGJ1ZCIsImEiOiJCVTZFMlRRIn0.0ZQ4d9-WZrekVy7ML89P4A';
-           var map = new mapboxgl.Map({
-               container: 'map',
-               minZoom: 0,
-               style: mapStyle,
-               hash: false,
-               //center: [10.2736833, 54.4996167],
-               //center: [8.4437483, 55.0494226],
-               center: [-1.0890453, 50.7783104],
-               zoom: 10
-           });
+   mapboxgl.accessToken = 'pk.eyJ1IjoibGJ1ZCIsImEiOiJCVTZFMlRRIn0.0ZQ4d9-WZrekVy7ML89P4A';
+   var map = new mapboxgl.Map({
+       container: 'map',
+       minZoom: 0,
+       style: mapStyle,
+       hash: false,
+       //center: [10.2736833, 54.4996167],
+       //center: [8.4437483, 55.0494226],
+       //center: [-1.0890453, 50.7783104],
+       //center: [8.5662692, 54.6807713],
+       center: [10.0362728, 54.6714421],
+       zoom: 10
+   });
 
-           const updateCanvas = () => {
-               const bounds = map.getBounds();
-               map.getSource('canvas').setCoordinates([bounds.getSouthWest(), bounds.getSouthEast(), bounds.getNorthEast(), bounds.getNorthWest()]);
+   const updateCanvas = () => {
+       const bounds = map.getBounds();
+       map.getSource('canvas').setCoordinates([bounds.getSouthWest(), bounds.getSouthEast(), bounds.getNorthEast(), bounds.getNorthWest()]);
 
-               if (lighthouses !== null) {
+       if (lighthouses !== null) {
 
-                   const polygon = {
-                       type: 'FeatureCollection',
-                       features: [ turf.polygon([
-                           [bounds.getSouthWest().toArray(),
-                            bounds.getSouthEast().toArray(),
-                            bounds.getNorthEast().toArray(),
-                            bounds.getNorthWest().toArray(),
-                            bounds.getSouthWest().toArray()]
-                       ]) ] };
+           const polygon = {
+               type: 'FeatureCollection',
+               features: [ turf.polygon([
+                   [bounds.getSouthWest().toArray(),
+                    bounds.getSouthEast().toArray(),
+                    bounds.getNorthEast().toArray(),
+                    bounds.getNorthWest().toArray(),
+                    bounds.getSouthWest().toArray()]
+               ]) ] };
 
-                   visible_lighthouses = turf.within(lighthouses, polygon);
-               }
-           };
+           visible_lighthouses = turf.within(lighthouses, polygon);
+       }
+   };
 
 
-           map.on('load', function() {
+   map.on('load', function() {
 
-               let source = map.getSource('lighthouses');
-               fetch(source.serialize().data)
-                   .then(response => response.json())
-                   .then(json => lighthouses = json)
-                   .then(updateCanvas)
-                   .catch(e => console.error(e));
+       let source = map.getSource('lighthouses');
+       fetch(source.serialize().data)
+           .then(response => response.json())
+           .then(json => lighthouses = json)
+           .then(updateCanvas)
+           .catch(e => console.error(e));
 
-               map.on('resize', resizeCanvas);
-               map.on('move', updateCanvas);
-               updateCanvas();
+       map.on('resize', resizeCanvas);
+       map.on('move', updateCanvas);
+       updateCanvas();
 
-               // initialize animation
-               loop(performance.now());
-           });
+       // initialize animation
+       loop(performance.now());
+   });
+
+   //console.log(getStep(1, "2+(1)+2+(1)+2+(1)+5+(1)"));
   </script>
 
 </body>
