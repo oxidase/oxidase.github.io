@@ -10,6 +10,7 @@
   <script src="./lib/react.min.js"></script>
   <script src="./lib/react-dom.min.js"></script>
   <script src="./lib/resize.js"></script>
+  <script src="./lib/turf.js"></script>
 
 
   <style>
@@ -206,8 +207,22 @@
 
    const updateCanvas = () => {
        const bounds = map.getBounds();
-       let source = map.getSource('canvas');
-       source.setCoordinates([bounds.getSouthWest(), bounds.getSouthEast(), bounds.getNorthEast(), bounds.getNorthWest()]);
+       map.getSource('canvas').setCoordinates([bounds.getSouthWest(), bounds.getSouthEast(), bounds.getNorthEast(), bounds.getNorthWest()]);
+
+       if (lighthouses !== null) {
+
+           const polygon = {
+               type: 'FeatureCollection',
+               features: [ turf.polygon([
+                   [bounds.getSouthWest().toArray(),
+                    bounds.getSouthEast().toArray(),
+                    bounds.getNorthEast().toArray(),
+                    bounds.getNorthWest().toArray(),
+                    bounds.getSouthWest().toArray()]
+               ]) ] };
+
+           visible_lighthouses = turf.within(lighthouses, polygon);
+       }
    };
 
 
@@ -216,7 +231,9 @@
        let source = map.getSource('lighthouses');
        fetch(source.serialize().data)
            .then(response => response.json())
-           .then(json => lighthouses = json);
+           .then(json => lighthouses = json)
+           .then(updateCanvas)
+           .catch(e => console.error(e));
 
        map.on('moveend', updateCanvas);
        updateCanvas();
