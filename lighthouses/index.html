@@ -23,6 +23,7 @@
   </div>
 
   <script>
+   'use strict';
 
    // -----
    // Utility functions
@@ -168,7 +169,7 @@
                              'amber': '#ffbf00', 'violet': '#ee82ee',  'orange': '#ffa500', 'magenta': '#ff00ff'};
 
    let getStep = (time, sequence) => {
-       let patt = /([0-9]+(\.[0-9]*)?|\.[0-9]+)/igm, t = 0., step = 0;
+       let patt = /([0-9]+(\.[0-9]*)?|\.[0-9]+)/igm, t = 0., step = 0, match;
        while (match = patt.exec(sequence)) {
            /* if (step % 2 === 1 && (patt.lastIndex >= sequence.length || sequence[patt.lastIndex] !== ')')) {
             *     console.error('bad sequence string' + sequence);
@@ -205,7 +206,7 @@
            return renderingColors[color];
        } else if (character === 'FFl') {
            // Fixed and flashing
-           period = prop.hasOwnProperty(prefix + 'period') ? prop[prefix + 'period'] : 20;
+           const period = prop.hasOwnProperty(prefix + 'period') ? prop[prefix + 'period'] : 20;
            if ((timestamp % period ) < (period / 2))
                return renderingColors[color];
            let hsv = RGBtoHSV(HEXtoRGB(renderingColors[color]));
@@ -267,10 +268,10 @@
                               0,
                sector_end = prop.hasOwnProperty(prefix + 'orientation') ? prop[prefix + 'orientation'] + 3 :
                             prop.hasOwnProperty(prefix + 'sector_end') ? prop[prefix + 'sector_end'] :
-                            359;
-           radius = getDistance(prop.hasOwnProperty(prefix + 'radius') ? prop[prefix + 'radius'] / 60. :
-                                prop.hasOwnProperty(prefix + 'range') ? prop[prefix + 'range'] / 600. :
-                                1. / 60);
+                            359,
+               radius = getDistance(prop.hasOwnProperty(prefix + 'radius') ? prop[prefix + 'radius'] / 60. :
+                                    prop.hasOwnProperty(prefix + 'range') ? prop[prefix + 'range'] / 600. :
+                                    1. / 60);
 
            sector_start = Math.PI * (270 - sector_start) / 180.;
            sector_end = Math.PI * (270 - sector_end) / 180.;
@@ -304,10 +305,10 @@
    // Anmation loop
    let prevTimestamp = null;
    function loop(timestamp) {
-       updateDots();
+       //updateDots();
        if (timestamp - prevTimestamp > 0) {
            context.clearRect(0, 0, canvas.width, canvas.height);
-           drawDots();
+           //drawDots();
            drawLighthouses(timestamp);
            prevTimestamp = timestamp;
        }
@@ -333,8 +334,8 @@
                "coordinates": [[0, 0], [0, 1], [1, 1], [1, 0]]
            }
        },
-       'sprite': 'http://localhost:7777/assets/INT1',
-       //'sprite': 'http://oxidase.github.io/lighthouses/assets/INT1',
+       //'sprite': 'http://localhost:7777/assets/INT1',
+       'sprite': 'http://oxidase.github.io/lighthouses/assets/INT1',
        'glyphs': 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
        'layers': [
            {
@@ -454,8 +455,6 @@
        // initialize animation
        loop(performance.now());
    });
-
-   //console.log(getStep(1, "2+(1)+2+(1)+2+(1)+5+(1)"));
   </script>
 
 </body>
