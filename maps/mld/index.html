@@ -111,9 +111,9 @@
           .then(max => max_step = max.reduce((a,b) => Math.max(a,b)))
           .catch(e => console.error(e));
 
-   var timer = new Tock({interval: 120, onTick: () => {
+   var timer = new Tock({interval: 500, onTick: () => {
        if (max_step !== null && maps_loaded === maps.length) {
-           step += 10;
+           step += 20;
            for (let i in maps) {
                let level = 0;
                while (maps[i].getLayer('forward' + level)) {
