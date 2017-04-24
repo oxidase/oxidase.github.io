@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>OSRM MLD</title>
+  <meta charset='utf-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- <script src='./lib/mapbox-gl-dev.js'></script>
+       <link href='./lib/mapbox-gl.css' rel='stylesheet' /> -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.36.0/mapbox-gl.css' rel='stylesheet' />
+  <script src='./lib/fetch.js'></script>
+  <script src='./lib/tock.min.js'></script>
+
+  <style>
+   body { margin: 0; padding: 0; }
+   html, body, #maps { width: 100%; height: 100%; }
+
+   .submaps {
+       display: inline-block;
+       width: 30%;
+       height: 100%;
+   }
+   .submap {
+       height: 25%;
+   }
+   #map {
+       display: inline-block;
+       /* float:right; */
+       width:40%;
+       height: 100%;
+   }
+  </style>
+</head>
+
+<body>
+  <div id="maps">
+    <div class="submaps">
+      <div id="forward0" class="submap"></div>
+      <div id="forward1" class="submap"></div>
+      <div id="forward2" class="submap"></div>
+      <div id="forward3" class="submap"></div>
+    </div><div id="map"></div><div class="submaps">
+      <div id="reverse0" class="submap"></div>
+      <div id="reverse1" class="submap"></div>
+      <div id="reverse2" class="submap"></div>
+      <div id="reverse3" class="submap"></div>
+    </div>
+  </div>
+
+  <script>
+   'use strict';
+
+   mapboxgl.accessToken = 'pk.eyJ1IjoibGJ1ZCIsImEiOiJCVTZFMlRRIn0.0ZQ4d9-WZrekVy7ML89P4A';
+
+   const addLayer = (map, source, level, color) => {
+       map.addLayer({'id': source + level, 'source': source, 'type': 'line', 'paint': {'line-color': color, 'line-width': 6},
+                     'filter': ['all', ['==', 'level', +level], ['<', 'order', 0 ]]
+       });
+   };
+
+   const updateLayer = (map, source, level, step) => {
+       map.setFilter(source + level, ['all', ['==', 'level', +level], ['<', 'order', step]]);
+   }
+
+   let maps_loaded = 0;
+   const addMap = (container, center, zoom, style) => {
+       style = style || 'mapbox://styles/mapbox/dark-v9';
+       var map = new mapboxgl.Map({
+           container: container,
+           minZoom: 0,
+           style: style,
+           hash: false,
+           center: center,
+           zoom: zoom
+       });
+
+       map.on('load', function() {
+           map.addSource('forward', { 'type': 'geojson', 'data': './data/mld_forward_heap.json'});
+           map.addSource('reverse', { 'type': 'geojson', 'data': './data/mld_reverse_heap.json'});
+           map.addSource('path', { 'type': 'geojson', 'data': './data/path.json'});
+
+           const forward_colors = ['#196240', '#269561', '#33c377', '#afdec5', '#e8f5ee'];
+           for (let i in forward_colors)  addLayer(map, 'forward', i, forward_colors[i]);
+
+           const reverse_colors = ['#812A51', '#b43b71', '#ee4e8b', '#f8c8da', '#fbe5ee'];
+           for (let i in reverse_colors)  addLayer(map, 'reverse', i, reverse_colors[i]);
+
+           //map.on('moveend', () => { console.log(map.getCenter(), map.getZoom()); });
+           ++maps_loaded;
+       });
+
+       return map;
+   };
+
+   let maps = [addMap('map', [10.447683, 51.163375], 6),
+               addMap('forward0', [11.570575973585846, 48.135277429767285], 14),
+               addMap('forward1', [11.570575973585846, 48.135277429767285], 12),
+               addMap('forward2', [11.570575973585846, 48.135277429767285], 10),
+               addMap('forward3', [11.570575973585846, 48.135277429767285], 8),
+               addMap('reverse0', [13.386460697598977, 52.5204842847734], 13),
+               addMap('reverse1', [13.386460697598977, 52.5204842847734], 11),
+               addMap('reverse2', [13.386460697598977, 52.5204842847734], 9),
+               addMap('reverse3', [13.386460697598977, 52.5204842847734], 7)];
+
+   let step = 0;
+
+   let max_step = null;
+   Promise.all(['./data/mld_forward_heap.json', './data/mld_reverse_heap.json'].map(url => fetch(url).then(resp => resp.json())))
+          .then(responses => responses.map(json => json.features.map(x => x.properties.order).reduce((a,b) => Math.max(a, b))))
+          .then(max => max_step = max.reduce((a,b) => Math.max(a,b)))
+          .catch(e => console.error(e));
+
+   var timer = new Tock({interval: 120, onTick: () => {
+       if (max_step !== null && maps_loaded === maps.length) {
+           step += 10;
+           for (let i in maps) {
+               let level = 0;
+               while (maps[i].getLayer('forward' + level)) {
+                   updateLayer(maps[i], 'forward', level, step);
+                   updateLayer(maps[i], 'reverse', level, step);
+                   ++level;
+               }
+
+               if (step > max_step) {
+                   maps[i].addLayer({'id': 'path', 'source': 'path', 'type': 'line',
+                                     'paint': {'line-color': '#4264fb', 'line-opacity': 0.8, 'line-width': 8},
+                   });
+               }
+           }
+
+           if (step > max_step)
+               timer.stop();
+       }
+   }});
+
+
+   timer.start();
+
+  </script>
+
+</body>
+</html>
