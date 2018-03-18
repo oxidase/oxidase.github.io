@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>How custom GDB commands help ...</title>
+
+		<meta name="description" content="How custom GDB commands help win friends">
+		<meta name="author" content="Michael Krasnyk">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme.css" id="theme">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+		 var link = document.createElement( 'link' );
+		 link.rel = 'stylesheet';
+		 link.type = 'text/css';
+		 link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+		 document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		  <script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+		<div class="reveal">
+
+
+			<div class="slides">
+				<section>
+					<h1>How custom GDB commands help in C++ development</h1>
+					<p>with use cases from <a href"https://github.com/Project-OSRM/osrm-backend/">Project-OSRM</a></p>
+					<p>
+						<small>by <a href="https://github.com/oxidase/">Michael Krasnyk</a></small>
+					</p>
+				</section>
+
+				<section>
+					<h2>How to dive into new code bases?</h2>
+				</section>
+
+        <section data-background="giphy/expert.gif">
+					<h3>Find someone already familiar with the code base</h3>
+				</section>
+
+        <section data-background="giphy/documentation.gif">
+					<h3>Read documentation and in-line comments</h3>
+				</section>
+
+        <section>
+					<h3>Check tests results</h3>
+				</section>
+
+        <section>
+					<h3>Investigate development or production logs</h3>
+				</section>
+
+        <section data-background="giphy/debug.gif">
+					<h3>Debugging</h3>
+				</section>
+
+
+        <!-- Coordinates Printer -->
+        <section>
+					<h3>Custom types can be painful</h3>
+
+				  <pre><code class="sh" data-trim>
+(gdb) print node_coordinates[0]
+$1 = {lon = {__value = 11523257}, lat = {__value = 48149516}}
+				  </code></pre>
+
+
+				  <pre class="fragment"><code class="sh" data-trim>
+(gdb) ptype node_coordinates[0]
+type = struct osrm::util::Coordinate {
+osrm::util::FixedLongitude lon;
+osrm::util::FixedLatitude lat;
+public:
+Coordinate(void);
+Coordinate(const osrm::util::FloatCoordinate &);
+Coordinate(osrm::util::FloatLongitude, osrm::util::FloatLatitude);
+Coordinate(osrm::util::UnsafeFloatLongitude, osrm::util::UnsafeFloatLatitude);
+Coordinate(osrm::util::FixedLongitude, osrm::util::FixedLatitude);
+bool IsValid(void) const;
+}
+(gdb) ptype node_coordinates[0].lon
+type = struct osrm::Alias&#x3C;int, osrm::util::tag::longitude> [with From = int, Tag = osrm::util::tag::longitude] {
+    From __value;
+  public:
+    ...
+}
+(gdb) ptype node_coordinates[0].lat
+type = struct osrm::Alias&#x3C;int, osrm::util::tag::latitude> [with From = int, Tag = osrm::util::tag::latitude] {
+    From __value;
+  public:
+    ...
+}
+				  </code></pre>
+        </section>
+
+
+        <section>
+          <h3>Pretty-printers for custom data<sup><small>†</small></sup></h3>
+
+          <pre><code class="python" data-trim>
+class CoordinatePrinter:
+    """Print a Coordinate object."""
+    def __init__(self, val):
+        self.PRECISION = 1e6
+        self.val = val
+
+    def to_string(self):
+        lon = int(self.val['lon']['__value']) / self.PRECISION
+        lat = int(self.val['lat']['__value']) / self.PRECISION
+        return '{{{}, {}}}'.format(lon, lat)
+          </code></pre>
+
+          <pre><code class="python" data-trim>
+gdb.printing.register_pretty_printer(
+    gdb.current_objfile(),
+    gdb.printing.RegexpCollectionPrettyPrinter('OSRM') \
+        .add_printer('Coordinate',
+                     '^osrm::util::Coordinate$',
+                     CoordinatePrinter))
+          </code></pre>
+          <div class="footer" style="font-size: 0.4em;"><sup><small>†</small></sup>requires GDB 7.0 with Python embedding</div>
+				</section>
+
+				<section>
+          <h3>🎉</h3>
+				  <pre><code class="sh" data-trim>
+(gdb) print node_coordinates[0]
+$1 = {11.523257, 48.149516}
+
+(gdb) print node_coordinates
+$2 = std::vector of length 170, capacity 170 = {
+{11.523257, 48.149516}, {11.521162, 48.150033},
+{11.519661, 48.151087}, {11.519349, 48.150363},
+{11.51207, 48.154147}, {11.513001, 48.153726},
+{11.514063, 48.152989}, {11.515832, 48.151786},
+{11.517154, 48.150996}, {11.52318, 48.14941},
+{11.520874, 48.149927}, {11.520267, 48.150031},
+{11.514187, 48.15309}, {11.520283, 48.150197},
+{11.520332, 48.151021}, {11.513153, 48.153826}, ... }
+				  </code></pre>
+				</section>
+
+        <section>
+          <h3>Custom GDB commands</h3>
+
+				  <pre><code class="python" data-noescape data-trim style="max-height: 560px">
+import webbrowser
+class GotoCoordinate (gdb.Command):
+    """Open openstretmap.org at the coordinate."""
+    def __init__ (self):
+        super (GotoCoordinate, self).__init__ ('open',
+           gdb.COMMAND_DATA, gdb.COMPLETE_EXPRESSION)
+        self.PRECISION = 1e6
+
+    def invoke (self, arg, from_tty):
+        val = gdb.parse_and_eval(arg)
+        type = val.type.target().unqualified()
+               if val.type.code == gdb.TYPE_CODE_REF
+               else val.type
+        if type.name == 'osrm::util::Coordinate':
+            lon = int(val['lon']['__value']) / self.PRECISION
+            lat = int(val['lat']['__value']) / self.PRECISION
+            url = 'http://www.openstreetmap.org/?zoom=18&mlat={}&mlon={}'
+            webbrowser.open(url.format(lat, lon))
+
+GotoCoordinate()
+				  </code></pre>
+        </section>
+
+
+        <section data-background-image="images/node_coordinates.png">
+          <a href="https://www.openstreetmap.org/?zoom=18&mlat=48.149927&mlon=11.520874" style="display:block; height:300px; width:100%">
+          </a>
+        </section>
+
+        <section>
+          <h3>More commands</h3>
+				  <pre><code class="sh" data-trim>
+(gdb) stop-at-intersection 48.1501974, 11.5202830
+Breakpoint 1 at 11.520283, 48.1501974
+          </code></pre>
+
+				  <pre><code class="sh" data-trim>
+(gdb) plot intersection
+          </code></pre>
+          <img src="images/intersection.png" width="45%">
+        </section>
+
+        <section>
+				  <pre><code class="sh" data-trim>
+(gdb) svg graph
+          </code></pre>
+          <img src="images/example-fullpage.png" height="560px">
+        </section>
+
+        <section>
+				  <pre><code class="sh" data-trim>
+(gdb) geojson steps
+          </code></pre>
+          <img src="images/geojson-fullpage.png" width="1200px">
+        </section>
+
+				<section style="text-align: left;">
+					<h2>Takeaway message</h2>
+					<ul>
+						<li> Pretty-printers and custom commands are great and save development time</li>
+						<li>Widely used libraries <s>should</s>must have debugger support</li>
+					</ul>
+          <h2 style="margin-top: 3cm;">Q&A</h2>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+		 // More info https://github.com/hakimel/reveal.js#configuration
+		 Reveal.initialize({
+				 controls: true,
+				 progress: true,
+				 history: true,
+				 center: true,
+
+				 transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				 // More info https://github.com/hakimel/reveal.js#dependencies
+				 dependencies: [
+					   { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					   { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					   { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					   { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					   { src: 'plugin/search/search.js', async: true },
+					   { src: 'plugin/zoom-js/zoom.js', async: true },
+					   { src: 'plugin/notes/notes.js', async: true }
+				 ]
+		 });
+
+		</script>
+
+	</body>
+</html>

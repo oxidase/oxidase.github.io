@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head><meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8"/>
+  <style>
+    svg { background-color: beige; }
+    .node { stroke: #000; stroke-width: 4; fill: none; marker-end: url(#forward) }
+    .node.forward { stroke-width: 2; stroke: #080; font-family: sans; font-size: 42px }
+    .node.reverse { stroke-width: 2; stroke: #f00; font-family: sans; font-size: 42px }
+    .segment { marker-start: url(#osm-node); marker-end: url(#osm-node); }
+    .segment.weight { font-family: sans; font-size:24px; text-anchor:middle; stroke-width: 1;  }
+    .segment.weight.forward { stroke: #080; fill: #080; }
+    .segment.weight.reverse { stroke: #f00; fill: #f00; }
+    .edge { stroke: #00f; stroke-width: 2; fill: none; }
+    .edge.forward { stroke: #0c0; stroke-width: 1; marker-end: url(#forward) }
+    .edge.backward { stroke: #f00; stroke-width: 1; marker-start: url(#reverse) }
+    .edge.both { stroke: #fc0; stroke-width: 1; marker-end: url(#forward); marker-start: url(#reverse) }
+    .coordinates { font-size: 12px; fill: #333 }
+  </style>
+</head>
+<svg viewBox="0 0 2100 1600"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <marker id="forward" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 C3,3 3,3 0,6 L9,3 z" fill="#000" />
+    </marker>
+
+    <marker id="reverse" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M9,0 C6,3 6,3 9,6 L0,3 z" fill="#000" />
+    </marker>
+
+    <marker id="osm-node" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto" markerUnits="strokeWidth">
+      <circle cx="5" cy="5" r="5"  fill="#000" />
+    </marker>
+  </defs>
+<path id="n0" class="node" d="M2025.0,75.0 L2025.0,1525.0" /><text><textPath class="node forward" xlink:href="#n0" startOffset="60%">0</textPath></text>
+<path id="s0.0" class="segment" d="M2025.0,75.0 L2025.0,1525.0" /><text class="segment weight forward"><textPath xlink:href="#s0.0" startOffset="50%">200</textPath></text>
+<path id="n1" class="node" d="M75.0,800.0 L725.0,800.0 L1375.0,800.0" /><text><textPath class="node forward" xlink:href="#n1" startOffset="60%">1</textPath></text>
+<path id="s1.0" class="segment" d="M75.0,800.0 L725.0,800.0" /><text class="segment weight forward"><textPath xlink:href="#s1.0" startOffset="50%">100</textPath></text>
+<path id="s1.1" class="segment" d="M725.0,800.0 L1375.0,800.0" /><text class="segment weight forward"><textPath xlink:href="#s1.1" startOffset="50%">100</textPath></text>
+<path id="n2" class="node" d="M1375.0,800.0 L2025.0,75.0" /><text><textPath class="node forward" xlink:href="#n2" startOffset="60%">2</textPath></text>
+<path id="s2.0" class="segment" d="M1375.0,800.0 L2025.0,75.0" /><text class="segment weight forward"><textPath xlink:href="#s2.0" startOffset="50%">141</textPath></text>
+<path id="n3" class="node" d="M1375.0,800.0 L725.0,800.0 L75.0,800.0" /><text><textPath class="node reverse" xlink:href="#n3" startOffset="60%">3</textPath></text>
+<path id="s3.0" class="segment" d="M1375.0,800.0 L725.0,800.0" /><text class="segment weight reverse"><textPath xlink:href="#s3.0" startOffset="50%">100</textPath></text>
+<path id="s3.1" class="segment" d="M725.0,800.0 L75.0,800.0" /><text class="segment weight reverse"><textPath xlink:href="#s3.1" startOffset="50%">100</textPath></text>
+<path id="n4" class="node" d="M1375.0,800.0 L2025.0,1525.0" /><text><textPath class="node forward" xlink:href="#n4" startOffset="60%">4</textPath></text>
+<path id="s4.0" class="segment" d="M1375.0,800.0 L2025.0,1525.0" /><text class="segment weight forward"><textPath xlink:href="#s4.0" startOffset="50%">141</textPath></text>
+<path id="n5" class="node" d="M2025.0,1525.0 L2025.0,75.0" /><text><textPath class="node reverse" xlink:href="#n5" startOffset="60%">5</textPath></text>
+<path id="s5.0" class="segment" d="M2025.0,1525.0 L2025.0,75.0" /><text class="segment weight reverse"><textPath xlink:href="#s5.0" startOffset="50%">200</textPath></text>
+<path id="n6" class="node" d="M2025.0,1525.0 L1375.0,800.0" /><text><textPath class="node reverse" xlink:href="#n6" startOffset="60%">6</textPath></text>
+<path id="s6.0" class="segment" d="M2025.0,1525.0 L1375.0,800.0" /><text class="segment weight reverse"><textPath xlink:href="#s6.0" startOffset="50%">318</textPath></text>
+
+
+<text x="2025.0" y="20" class="coordinates" text-anchor="middle">1.002697</text>
+<text x="1375.0" y="20" class="coordinates" text-anchor="middle">1.001798</text>
+<text x="75.0" y="20" class="coordinates" text-anchor="middle">1.0</text>
+<text x="725.0" y="20" class="coordinates" text-anchor="middle">1.000899</text>
+<text x="20" y="1525.0" transform="rotate(-90 20 1525.0)" class="coordinates" text-anchor="middle">0.998202</text>
+<text x="20" y="75.0" transform="rotate(-90 20 75.0)" class="coordinates" text-anchor="middle">1.0</text>
+<text x="20" y="800.0" transform="rotate(-90 20 800.0)" class="coordinates" text-anchor="middle">0.999101</text>
+
+</svg></html>
