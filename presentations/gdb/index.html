@@ -48,7 +48,7 @@
 				</section>
 
 				<section>
-					<h2>How to dive into new code bases?</h2>
+					<h2>How to dive into new code?</h2>
 				</section>
 
         <section data-background="giphy/expert.gif">
@@ -59,7 +59,7 @@
 					<h3>Read documentation and in-line comments</h3>
 				</section>
 
-        <section>
+        <section data-background="images/ezgif.com-optimize.gif">
 					<h3>Check tests results</h3>
 				</section>
 
@@ -110,6 +110,24 @@ type = struct osrm::Alias&#x3C;int, osrm::util::tag::latitude> [with From = int,
 				  </code></pre>
         </section>
 
+				<section>
+          <h3>🎉</h3>
+				  <pre><code class="sh" data-trim>
+(gdb) print node_coordinates[0]
+$1 = {11.523257, 48.149516}
+
+(gdb) print node_coordinates
+$2 = std::vector of length 170, capacity 170 = {
+{11.523257, 48.149516}, {11.521162, 48.150033},
+{11.519661, 48.151087}, {11.519349, 48.150363},
+{11.51207, 48.154147}, {11.513001, 48.153726},
+{11.514063, 48.152989}, {11.515832, 48.151786},
+{11.517154, 48.150996}, {11.52318, 48.14941},
+{11.520874, 48.149927}, {11.520267, 48.150031},
+{11.514187, 48.15309}, {11.520283, 48.150197},
+{11.520332, 48.151021}, {11.513153, 48.153826}, ... }
+				  </code></pre>
+				</section>
 
         <section>
           <h3>Pretty-printers for custom data<sup><small>†</small></sup></h3>
@@ -138,25 +156,6 @@ gdb.printing.register_pretty_printer(
           <div class="footer" style="font-size: 0.4em;"><sup><small>†</small></sup>requires GDB 7.0 with Python embedding</div>
 				</section>
 
-				<section>
-          <h3>🎉</h3>
-				  <pre><code class="sh" data-trim>
-(gdb) print node_coordinates[0]
-$1 = {11.523257, 48.149516}
-
-(gdb) print node_coordinates
-$2 = std::vector of length 170, capacity 170 = {
-{11.523257, 48.149516}, {11.521162, 48.150033},
-{11.519661, 48.151087}, {11.519349, 48.150363},
-{11.51207, 48.154147}, {11.513001, 48.153726},
-{11.514063, 48.152989}, {11.515832, 48.151786},
-{11.517154, 48.150996}, {11.52318, 48.14941},
-{11.520874, 48.149927}, {11.520267, 48.150031},
-{11.514187, 48.15309}, {11.520283, 48.150197},
-{11.520332, 48.151021}, {11.513153, 48.153826}, ... }
-				  </code></pre>
-				</section>
-
         <section>
           <h3>Custom GDB commands</h3>
 
@@ -183,7 +182,6 @@ class GotoCoordinate (gdb.Command):
 GotoCoordinate()
 				  </code></pre>
         </section>
-
 
         <section data-background-image="images/node_coordinates.png">
           <a href="https://www.openstreetmap.org/?zoom=18&mlat=48.149927&mlon=11.520874" style="display:block; height:300px; width:100%">
@@ -221,7 +219,7 @@ Breakpoint 1 at 11.520283, 48.1501974
 					<h2>Takeaway message</h2>
 					<ul>
 						<li> Pretty-printers and custom commands are great and save development time</li>
-						<li>Widely used libraries <s>should</s>must have debugger support</li>
+						<li>Widely used libraries <s>should</s> must have debugger support</li>
 					</ul>
           <h2 style="margin-top: 3cm;">Q&A</h2>
 				</section>
