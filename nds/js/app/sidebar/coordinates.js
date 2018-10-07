@@ -1,4 +1,4 @@
-define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, tileid, distance) {
+define(['leaflet', 'knockout', 'utm', 'nds/tileid', 'nds/distance'], function(L, ko, utm, tileid, distance) {
 
     var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet', 'cyan', 'magenta', 'lime', 'olive', 'maroon', 'purple'];
 
@@ -8,6 +8,9 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
 
     function round6(x) {
         return Math.sign(x) * Math.abs(Math.round(1000000. * x)) / 1000000.;
+    }
+    function round1(x) {
+        return Math.sign(x) * Math.abs(Math.round(10. * x)) / 10.;
     }
 
     /**
@@ -44,6 +47,14 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
             } else if (type === 'mercator') {
                 lng = tileid.mercator2wgsx(lng);
                 lat = tileid.mercator2wgsy(lat);
+            } else if (type === 'utm32n') {
+              try {
+                const ll = utm.toLatLon(lng, lat, 32, 'N');
+                lng = ll.longitude;
+                lat = ll.latitude;
+              } catch (e) {
+                console.log(e);
+              }
             }
             self.lng(lng);
             self.lat(lat);
@@ -62,6 +73,17 @@ define(['leaflet', 'knockout', 'nds/tileid', 'nds/distance'], function(L, ko, ti
         self.nds = ko.pureComputed({owner: self,
             read: function () { return ~~(self.lng() / 90. * 0x40000000) + ", " + ~~(self.lat() / 90. * 0x40000000); },
             write: function (v) { self.lnglat(v.match(/[-+]?[0-9]*\.?[0-9]+/g), 'nds'); }
+        });
+
+        self.utm32n = ko.pureComputed({owner: self,
+            read: function () {
+              const xy = utm.fromLatLon(self.lat(), self.lng());
+              if (xy.zoneNum !== 32) {
+                return `Coordinates in zone ${xy.zoneNum}${xy.zoneLetter}`;
+              }
+              return round1(xy.easting) + ", " + round1(xy.northing);
+            },
+            write: function (v) { self.lnglat(v.match(/[-+]?[0-9]*\.?[0-9]+/g), 'utm32n'); },
         });
 
         self.mercator = ko.pureComputed({owner: self,
