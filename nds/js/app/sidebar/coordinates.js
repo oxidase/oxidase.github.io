@@ -244,7 +244,7 @@ define(['leaflet', 'knockout', 'utm', 'nds/tileid', 'nds/distance'], function(L,
         }
 
         // set initial state
-        self.add({latlng:{lat: 48.137270, lng: 11.575506}});
+        self.add({latlng:{lat: 52.52, lng: 13.41}});
     }
 
     return CoordinatesViewModel;
